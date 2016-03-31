@@ -1,0 +1,24 @@
+{
+  "name": "k-mix-api",
+  "version": "1.0.0",
+  "description": "Javascript API for full control of K-Mix",
+  "keywords": ["k-mix", "kmix", "mixer"],
+  "repository": "https://github.com/keithmcmilleninstruments/k-mix-api.git",
+  "homepage": "https://github.com/keithmcmilleninstruments/k-mix-api/",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andrej Hronco",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.7.0",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.6.0"
+  },
+  "dependencies": {
+    "eventemitter3": "^1.2.0",
+    "lodash": "^4.6.1",
+    "midi-ports": "^1.0.1"
+  }
+}
