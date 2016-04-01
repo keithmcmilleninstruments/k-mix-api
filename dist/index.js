@@ -96,6 +96,7 @@ var KMIX = function KMIX(midi) {
 			    message = void 0,
 			    port = ports[0],
 			    controlType = (0, _controlMessage.getControlType)(control);
+			console.log('controlType', controlType);
 
 			time = time || 0;
 
@@ -103,7 +104,7 @@ var KMIX = function KMIX(midi) {
 				case 'raw':
 					// raw : send([176,1,127], time)
 					message = control;
-					time = value;
+					time = value || 0;
 					port = ports[0];
 
 					break;
@@ -126,22 +127,8 @@ var KMIX = function KMIX(midi) {
 				default:
 					// 'input', 'main', 'misc', 'preset'
 					// to audio control : send('fader:1', value, time)
-					control = control.split(':')[1];
 					message = (0, _controlMessage2.default)(control, value, controlType);
 					break;
-
-				/*
-    raw
-    send([176,1,127], time)
-    send('control', [176,1,127], time)
-    	control
-    send('control:fader-1', value, time)
-    	audio-control
-    	send('fader:1', value, time) // input
-    send('main:mute', value, time) // main
-    send('misc:reverb-level', value, time) // misc
-    send('preset', value, time) // preset
-    */
 			}
 
 			output = midi.outputs.get(devices[device][port].outputID);

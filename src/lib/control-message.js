@@ -23,19 +23,22 @@ function findBank(banks, channel, options){
 }
 
 function getControlType(control){
-	let controlType = '', controlSplit = control.split(':')
+	let controlType = '', controlSplit = ''
  // raw, raw-control, control, input, main, misc, preset
 	if(Array.isArray(control)){ // raw
 		controlType = 'raw'
-	} else if(control === 'control'){ // raw-control
-		controlType = 'raw-control'
-	} else if(controlSplit[0] === 'control'){ // control
-		controlType = 'control'
-	} else if(!isNaN(controlSplit[1])){ // input
-		controlType = 'input'
-	} else { // main, misc, preset
-		controlType = controlSplit[0]
-	}
+	} else {
+		controlSplit = control.split(':')
+		if(control === 'control'){ // raw-control
+			controlType = 'raw-control'
+		} else if(controlSplit[0] === 'control'){ // control
+			controlType = 'control'
+		} else if(!isNaN(controlSplit[1])){ // input
+			controlType = 'input'
+		} else { // main, misc, preset
+			controlType = controlSplit[0]
+		}
+	} 
 
 	return controlType
 }
@@ -44,9 +47,16 @@ function controlMessage(control, value, messageType = 'input'){
 	let messageTypes = ['input', 'main', 'misc', 'preset'],
 			channelTypes = [1, 9, 10, 1],
 			controlSplit = control.split(':'), 
-			controlName = controlSplit[0],
-			inputChannel = +controlSplit[1],
+			controlName,
+			inputChannel,
 			type, cc;
+
+			if(messageType === 'input'){
+				controlName = controlSplit[0]
+				inputChannel = +controlSplit[1]
+			} else {
+				controlName = controlSplit[1]
+			}
 
 			if(control === 'preset'.toLowerCase()){
 				type = 192

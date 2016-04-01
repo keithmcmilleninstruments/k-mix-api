@@ -10,7 +10,8 @@ var _lodash = require('lodash');
 function controlMessageFromOptions(control, value, bank, options) {
 	var banks = ['bank_1', 'bank_2', 'bank_3'],
 	    channel = options['midi-channels'][bank - 1],
-	    cc = options[control][banks[bank - 1]];
+	    cc = options[control][banks[bank - 1]],
+	    type = 0;
 
 	if (control.includes('fader') || control.includes('rotary')) {
 		type = 176;

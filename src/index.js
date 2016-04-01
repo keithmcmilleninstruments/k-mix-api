@@ -57,6 +57,7 @@ let KMIX = function KMIX(midi, userOptions = {}, debug = false){
 			let output, message, 
 					port = ports[0],
 					controlType = getControlType(control);
+			console.log('controlType', controlType);
 			
 			time = time || 0
 
@@ -64,7 +65,7 @@ let KMIX = function KMIX(midi, userOptions = {}, debug = false){
 				case 'raw':
 					// raw : send([176,1,127], time)
 					message = control
-					time = value
+					time = value || 0
 					port = ports[0];
 					
 					break;
@@ -86,29 +87,12 @@ let KMIX = function KMIX(midi, userOptions = {}, debug = false){
 
 				default: // 'input', 'main', 'misc', 'preset'
 					// to audio control : send('fader:1', value, time)
-					control = control.split(':')[1]
 					message = controlMessage(control, value, controlType)
 					break;
-
-					/*
-					raw
-					send([176,1,127], time)
-					send('control', [176,1,127], time)
-
-					control
-					send('control:fader-1', value, time)
-
-					audio-control
-
-					send('fader:1', value, time) // input
-					send('main:mute', value, time) // main
-					send('misc:reverb-level', value, time) // misc
-					send('preset', value, time) // preset
-					*/
 			}
 			
 			output = midi.outputs.get(devices[device][port].outputID)
-			
+
 			if(message.length < 3 && controlType !== 'preset') {
 				console.log('Please check control name');
 			} else {
