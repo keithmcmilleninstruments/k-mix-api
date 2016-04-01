@@ -28,10 +28,10 @@ function help(options, request) {
 	switch (request) {
 		case 'input':
 			console.log('\nhelp:input');
-			console.table(helpObject(_controlMessage.messages[0], 'control: per-channel'));
+			console.table(helpObject(_controlMessage.messages[0], 'control: per-channel 1 -8'));
 			break;
-		case 'main_out':
-			console.log('\nhelp:main_out');
+		case 'main':
+			console.log('\nhelp:main');
 			console.table(helpObject(_controlMessage.messages[1], 'control: channel 9 (auto)'));
 			break;
 		case 'misc':
@@ -39,7 +39,7 @@ function help(options, request) {
 			console.table(helpObject(_controlMessage.messages[1], 'control: channel 10 (auto)'));
 			break;
 		case 'control':
-			console.log('\nhelp:control. What channels are assigned to each control/bank');
+			console.log('\nhelp:control. What channels are assigned to each control/bank, Editor MIDI tab');
 			console.table((0, _lodash.omit)(options, 'midi-channels')); // omit type
 			break;
 	}
