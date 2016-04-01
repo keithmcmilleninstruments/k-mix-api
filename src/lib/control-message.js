@@ -22,12 +22,30 @@ function findBank(banks, channel, options){
 	return banks[indexOf(options['midi-channels'], channel + 1)];
 }
 
+function getControlType(control){
+	let controlType = '', controlSplit = control.split(':')
+ // raw, raw-control, control, input, main, misc, preset
+	if(Array.isArray(control)){ // raw
+		controlType = 'raw'
+	} else if(control === 'control'){ // raw-control
+		controlType = 'raw-control'
+	} else if(controlSplit[0] === 'control'){ // control
+		controlType = 'control'
+	} else if(!isNaN(controlSplit[1])){ // input
+		controlType = 'input'
+	} else { // main, misc, preset
+		controlType = controlSplit[0]
+	}
+
+	return controlType
+}
+
 function controlMessage(control, value, messageType = 'input'){
-	let messageTypes = ['input', 'main_out', 'misc', 'preset'],
+	let messageTypes = ['input', 'main', 'misc', 'preset'],
 			channelTypes = [1, 9, 10, 1],
 			controlSplit = control.split(':'), 
 			controlName = controlSplit[0],
-			inputChannel = (controlSplit[1] === 'master'.toLowerCase()) ? 9 : +controlSplit[1],
+			inputChannel = +controlSplit[1],
 			type, cc;
 
 			if(control === 'preset'.toLowerCase()){
@@ -48,4 +66,4 @@ function controlMessage(control, value, messageType = 'input'){
 	return without(message, undefined, null);
 }
 
-export { controlMessage as default, findControl, findBank, findBank, messages };
+export { controlMessage as default, findControl, getControlType, findBank, findBank, messages };

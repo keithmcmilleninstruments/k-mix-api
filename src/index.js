@@ -8,7 +8,7 @@ import deviceData from './lib/device-data';
 import createDeviceList from 'midi-ports';
 import kmixDefaults from "./lib/kmix-defaults";
 import controlMessageFromOptions from './lib/control-message-from-options';
-import { default as controlMessage , findControl, findBank, findIndex } from "./lib/control-message";
+import { default as controlMessage, getControlType, findControl, findBank, findIndex } from "./lib/control-message";
 import help from "./lib/help";
 
 let events = new EventEmitter(),
@@ -53,30 +53,63 @@ let KMIX = function KMIX(midi, userOptions = {}, debug = false){
 		emit: function emit(event, data){
 			events.emit(event, data);
 		},
-		send: function send(control, value, controlType, time, bank = 1){
+		send: function send(control, value, time, bank = 1){
 			let output, message, 
-					port = ports[1],
-					type,
-					controlSplit = (isArray(control)) ? '' : control.split(':');
+					port = ports[0],
+					controlType = getControlType(control);
 			
 			time = time || 0
 
-			if(isArray(control)){ // raw to either
-				message = control
-				time = value
-				port = (controlType && controlType.toLowerCase() === 'control') ? ports[1] : ports[0];
-			} else if(controlSplit[0].toLowerCase() === 'control') { // to control-surface : (control, value, type, time, bank)
-					port = ports[1]
-					control = controlSplit[1]
-										
-					message = controlMessageFromOptions(control, value, controlType, bank, options)
-			} else { // to audio-control : default
-				message = controlMessage(control, value, controlType)
+			switch(controlType){
+				case 'raw':
+					// raw : send([176,1,127], time)
+					message = control
+					time = value
+					port = ports[0];
+					
+					break;
+
+				case 'raw-control':
+					// raw-control : send('control',[176,1,127], time)
+					message = value
+					port = ports[1];
+					
+					break;
+
+				case 'control':
+					// to control-surface : send('control:button-vu',0), send('control:fader-1', 64)
+					port = ports[1];
+					control = control.split(':')[1]
+					message = controlMessageFromOptions(control, value, bank, options)
+					
+					break;
+
+				default: // 'input', 'main', 'misc', 'preset'
+					// to audio control : send('fader:1', value, time)
+					control = control.split(':')[1]
+					message = controlMessage(control, value, controlType)
+					break;
+
+					/*
+					raw
+					send([176,1,127], time)
+					send('control', [176,1,127], time)
+
+					control
+					send('control:fader-1', value, time)
+
+					audio-control
+
+					send('fader:1', value, time) // input
+					send('main:mute', value, time) // main
+					send('misc:reverb-level', value, time) // misc
+					send('preset', value, time) // preset
+					*/
 			}
 			
 			output = midi.outputs.get(devices[device][port].outputID)
 			
-			if(control !== 'preset' && message.length < 3) {
+			if(message.length < 3 && controlType !== 'preset') {
 				console.log('Please check control name');
 			} else {
 				output.send(message,  window.performance.now() + time)
