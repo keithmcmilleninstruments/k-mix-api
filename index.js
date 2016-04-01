@@ -13,22 +13,27 @@ import help from "./lib/help";
 
 let events = new EventEmitter(),
 		device = 'k-mix', options = {},
+		ports = ['k-mix-audio-control', 'k-mix-control-surface'],
 		names = ['bank_1', 'bank_2', 'bank_3', 'mode'],
 		banks = initial(names)
+
 // debug
 let kmixLog = document.querySelector('#kmixlog');
 
 let KMIX = function KMIX(midi, userOptions = {}, debug = false){
+	if (!midi) {
+		throw 'MIDI Access object is mandatory.';
+	}
 	let newOptions = convertOptions(userOptions, names)
 	// make options
 	options = merge(kmixDefaults, newOptions)
 	// make devices object
 	let devices = createDeviceList(midi, deviceData)
 	// set message handlers
-	let input = midi.inputs.get(devices[device]['k-mix-control-surface'].inputID)	
+	let input = midi.inputs.get(devices[device][ports[1]].inputID)	
 
 	if(debug){
-		let inputDebug = midi.inputs.get(devices[device]['k-mix-audio-control'].inputID)
+		let inputDebug = midi.inputs.get(devices[device][ports[0]].inputID)
 		inputDebug.onmidimessage = function(e){
 			// add formatted console logging
 			midiEventHandler(e, true)
@@ -50,7 +55,8 @@ let KMIX = function KMIX(midi, userOptions = {}, debug = false){
 		},
 		send: function send(control, value, controlType, time, bank = 1){
 			let output, message, 
-					device = 'k-mix-audio-control', 
+					port = ports[1],
+					type,
 					controlSplit = (isArray(control)) ? '' : control.split(':');
 			
 			time = time || 0
@@ -58,33 +64,22 @@ let KMIX = function KMIX(midi, userOptions = {}, debug = false){
 			if(isArray(control)){ // raw to either
 				message = control
 				time = value
-				device = (controlType && controlType.toLowerCase() === 'control') ? 'k-mix-control-surface' : 'k-mix-audio-control';
-			} else if(controlSplit[0].toLowerCase() === 'control') { // to control-surface
-					device = 'k-mix-control-surface'
+				port = (controlType && controlType.toLowerCase() === 'control') ? ports[1] : ports[0];
+			} else if(controlSplit[0].toLowerCase() === 'control') { // to control-surface : (control, value, type, time, bank)
+					port = ports[1]
 					control = controlSplit[1]
-					
-					// message type logic
-					if(control.toLowerCase().includes('button')){
-						if(controlSplit[2] && controlSplit[2].toLowerCase() === 'off'){
-							controlType = 'off'
-						} else {
-							controlType = 'on'
-							// ........... buttons 0 = off, 1-127 = on, same type. must be set to toggle
-						}
-					} else {
-						controlType = 'cc'
-					}
+										
 					message = controlMessageFromOptions(control, value, controlType, bank, options)
 			} else { // to audio-control : default
 				message = controlMessage(control, value, controlType)
 			}
 			
-			output = midi.outputs.get(devices['k-mix'][device].outputID)
+			output = midi.outputs.get(devices[device][port].outputID)
 			
 			if(control !== 'preset' && message.length < 3) {
-				throw new Error('Please check control name');
+				console.log('Please check control name');
 			} else {
-				output.send(message, time)
+				output.send(message,  window.performance.now() + time)
 			}
 		}, 
 		help: partial(help, options)
