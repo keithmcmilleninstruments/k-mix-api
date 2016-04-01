@@ -149,9 +149,7 @@ function midiEventHandler(e, debug = false){
 function payload(data){
 	let value = data[2];
  	return {
-		value: value / 127,
-		deg: (value / 127) * 360,
-		rad:  (value / 127) * 360 * Math.PI / 180,
+		value: value,
 		raw: data
 	}
 }
