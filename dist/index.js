@@ -60,6 +60,7 @@ var KMIX = function KMIX(midi) {
 	if (!midi) {
 		throw 'MIDI Access object is mandatory.';
 	}
+
 	var newOptions = (0, _utilities.convertOptions)(userOptions, names);
 	// make options
 	options = (0, _lodash.merge)(_kmixDefaults2.default, newOptions);
@@ -85,9 +86,13 @@ var KMIX = function KMIX(midi) {
 	return {
 		on: function on(event, data) {
 			events.on(event, data);
+			// chaining
+			return this;
 		},
 		emit: function emit(event, data) {
 			events.emit(event, data);
+			// chaining
+			return this;
 		},
 		send: function send(control, value, time) {
 			var bank = arguments.length <= 3 || arguments[3] === undefined ? 1 : arguments[3];
@@ -96,7 +101,6 @@ var KMIX = function KMIX(midi) {
 			    message = void 0,
 			    port = ports[0],
 			    controlType = (0, _controlMessage.getControlType)(control);
-			console.log('controlType', controlType);
 
 			time = time || 0;
 
@@ -128,6 +132,7 @@ var KMIX = function KMIX(midi) {
 					// 'input', 'main', 'misc', 'preset'
 					// to audio control : send('fader:1', value, time)
 					message = (0, _controlMessage2.default)(control, value, controlType);
+
 					break;
 			}
 
@@ -138,6 +143,8 @@ var KMIX = function KMIX(midi) {
 			} else {
 				output.send(message, window.performance.now() + time);
 			}
+			// chaining
+			return this;
 		},
 		help: (0, _lodash.partial)(_help2.default, options)
 	};
@@ -151,11 +158,11 @@ function midiEventHandler(e) {
 	    channel = data[0] & 0xf,
 	    control = data[1],
 	    bank = (0, _controlMessage.findBank)(banks, channel, options),
-	    device = '',
+	    port = '',
 	    controlName = '',
 	    kind = '';
 
-	device = e.target.name;
+	port = e.target.name;
 
 	// find control; 'fader-1'
 	controlName = (0, _controlMessage.findControl)(control, type, bank, options);
@@ -172,20 +179,20 @@ function midiEventHandler(e) {
 	if (debug) {
 		var debugLog = {
 			'control:': controlName,
-			'device:': device,
-			'port:': e.target.id,
+			'port:': port,
+			'portID:': e.target.id,
 			'data:': data,
 			'channel:': channel + 1
 		};
 
-		if (device === 'K-Mix Audio Control') {
+		if (port === 'K-Mix Audio Control') {
 			debugLog = (0, _lodash.omit)(debugLog, 'control:');
 			debugLog['channel:'] = data[7] + 1;
 		}
 
 		console.log('Event Debug', debugLog);
 	}
-	if (kmixLog) kmixLog.innerHTML = controlName + '<br>from ' + device + '<br>port ' + e.target.id + '<br>' + data + '<br>channel ' + (channel + 1);
+	if (kmixLog) kmixLog.innerHTML = controlName + '<br>from ' + port + '<br>portID ' + e.target.id + '<br>' + data + '<br>channel ' + (channel + 1);
 }
 
 function payload(data) {
