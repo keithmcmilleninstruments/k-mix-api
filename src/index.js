@@ -24,6 +24,7 @@ let KMIX = function KMIX(midi, userOptions = {}, debug = false){
 	if (!midi) {
 		throw 'MIDI Access object is mandatory.';
 	}
+
 	let newOptions = convertOptions(userOptions, names)
 	// make options
 	options = merge(kmixDefaults, newOptions)
@@ -49,15 +50,18 @@ let KMIX = function KMIX(midi, userOptions = {}, debug = false){
 	return {
 		on: function on(event, data){
 			events.on(event, data);
+			// chaining
+			return this
 		},
 		emit: function emit(event, data){
 			events.emit(event, data);
+			// chaining
+			return this
 		},
 		send: function send(control, value, time, bank = 1){
 			let output, message, 
 					port = ports[0],
 					controlType = getControlType(control);
-			console.log('controlType', controlType);
 			
 			time = time || 0
 
@@ -88,6 +92,7 @@ let KMIX = function KMIX(midi, userOptions = {}, debug = false){
 				default: // 'input', 'main', 'misc', 'preset'
 					// to audio control : send('fader:1', value, time)
 					message = controlMessage(control, value, controlType)
+
 					break;
 			}
 			
@@ -98,6 +103,8 @@ let KMIX = function KMIX(midi, userOptions = {}, debug = false){
 			} else {
 				output.send(message,  window.performance.now() + time)
 			}
+			// chaining
+			return this
 		}, 
 		help: partial(help, options)
 	}
@@ -109,11 +116,11 @@ function midiEventHandler(e, debug = false){
 			channel = data[0] & 0xf,
 			control = data[1],
 			bank = findBank(banks, channel, options),
-			device = '', 
+			port = '', 
 			controlName = '',
 			kind = '';
 
-	device = e.target.name;
+	port = e.target.name;
 
 	// find control; 'fader-1'
 	controlName = findControl(control, type, bank, options)
@@ -130,20 +137,20 @@ function midiEventHandler(e, debug = false){
 	if(debug){
 		let debugLog = { 
 			'control:' : controlName, 
-			'device:'  : device,
-			'port:'    : e.target.id,
+			'port:'  : port,
+			'portID:'    : e.target.id,
 			'data:'    : data,
 			'channel:' : (channel + 1)
 		}
 
-		if(device === 'K-Mix Audio Control'){
+		if(port === 'K-Mix Audio Control'){
 			debugLog = omit(debugLog, 'control:')
 			debugLog['channel:'] = data[7] + 1
 		}
 
 		console.log('Event Debug', debugLog);	
 	}
-	if(kmixLog) kmixLog.innerHTML = controlName + '<br>from ' + device + '<br>port ' + e.target.id + '<br>' + data + '<br>channel ' + (channel + 1);
+	if(kmixLog) kmixLog.innerHTML = controlName + '<br>from ' + port + '<br>portID ' + e.target.id + '<br>' + data + '<br>channel ' + (channel + 1);
 }
 
 function payload(data){

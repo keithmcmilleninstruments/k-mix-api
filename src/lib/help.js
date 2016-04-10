@@ -21,7 +21,7 @@ function help(options, request){
 			break;
 		case 'misc':
 			console.log('\nhelp:misc');
-			console.table(helpObject(CCTables[1], 'control: channel 10 (auto)'))
+			console.table(helpObject(CCTables[2], 'control: channel 10 (auto)'))
 			break;
 		case 'control':
 			console.log('\nhelp:control. What channels are assigned to each control/bank, Editor MIDI tab');
