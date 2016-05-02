@@ -101,8 +101,8 @@ kmix.on('any', (data) => {
 	}
 })
 ```
-##Sending* 
-**Sending data to K-Mix will be supported very soon.*
+##Sending*
+**Sending MIDI to K-Mix is supported in firmware/editor version 1.1.0 and above.*
 
 There are 3 different send modes with K-Mix:
 
