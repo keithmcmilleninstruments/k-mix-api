@@ -1,8 +1,10 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
+exports.default = void 0;
+
 /*
 'device' : {
 	'devicePort': {
@@ -12,18 +14,19 @@ Object.defineProperty(exports, "__esModule", {
 	'manufacturer': 'Keith McMillen Instruments'
 }
 */
-
-var devices = {
-	'k-mix': {
-		'k-mix-audio-control': {
-			'name': 'K-Mix Audio Control'
-		},
-		'k-mix-control-surface': {
-			'name': 'K-Mix Control Surface'
-		},
-		'icon': 'https://files.keithmcmillen.com/products/k-mix/icons/k-mix.svg',
-		'manufacturer': 'keith-mcmillen-instruments'
-	}
+var _default = {
+  'k-mix': {
+    'k-mix-audio-control': {
+      'name': 'K-Mix Audio Control'
+    },
+    'k-mix-control-surface': {
+      'name': 'K-Mix Control Surface'
+    },
+    'k-mix-expander': {
+      'name': 'K-Mix Expander'
+    },
+    'icon': 'https://files.keithmcmillen.com/products/k-mix/icons/k-mix.svg',
+    'manufacturer': 'keith-mcmillen-instruments'
+  }
 };
-
-exports.default = devices;
+exports.default = _default;
