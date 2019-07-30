@@ -1,5 +1,4 @@
-// convert to Map
-var defaults = {
+export default {
 	"midi-channels": [1,2,3],
 	"fader-1": {"bank_1": 1, "bank_2": 1, "bank_3": 1, "type": [176]},
 	"fader-2": {"bank_1": 2, "bank_2": 2, "bank_3": 2, "type": [176]},
@@ -43,7 +42,5 @@ var defaults = {
 	"diamond-up": {"bank_1": 26, "bank_2": 26, "bank_3": 26, "mode": "momentary", "type": [144, 128]},
 	"diamond-down": {"bank_1": 27, "bank_2": 27, "bank_3": 27, "mode": "momentary", "type": [144, 128]},
 	"diamond-left": {"bank_1": 28, "bank_2": 28, "bank_3": 28, "mode": "momentary", "type": [144, 128]},
-	"diamond-right": {"bank_1": 29, "bank_2": 29, "bank_3": 29, "mode": "momentary", "type": [144, 128]} 
+	"diamond-right": {"bank_1": 29, "bank_2": 29, "bank_3": 29, "mode": "momentary", "type": [144, 128]}
 };
-
-export { defaults as default };

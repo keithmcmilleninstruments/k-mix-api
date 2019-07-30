@@ -1,215 +1,140 @@
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
-exports.default = undefined;
+exports.default = void 0;
 
-var _eventemitter = require('eventemitter3');
+var _eventemitter = _interopRequireDefault(require("eventemitter3"));
 
-var _eventemitter2 = _interopRequireDefault(_eventemitter);
+var _lodash = require("lodash");
 
-var _lodash = require('lodash');
+var _midiPorts = _interopRequireDefault(require("midi-ports"));
 
-var _utilities = require('./lib/utilities');
+var _utilities = require("./lib/utilities");
 
-var _deviceData = require('./lib/device-data');
+var _deviceData = _interopRequireDefault(require("./lib/device-data"));
 
-var _deviceData2 = _interopRequireDefault(_deviceData);
+var _kmixDefaults = _interopRequireDefault(require("./lib/kmix-defaults"));
 
-var _midiPorts = require('midi-ports');
+var _midiMessageHandler = _interopRequireDefault(require("./lib/midiMessageHandler"));
 
-var _midiPorts2 = _interopRequireDefault(_midiPorts);
+var _controlMessageFromOptions = _interopRequireDefault(require("./lib/control-message-from-options"));
 
-var _kmixDefaults = require('./lib/kmix-defaults');
+var _controlMessage = _interopRequireWildcard(require("./lib/control-message"));
 
-var _kmixDefaults2 = _interopRequireDefault(_kmixDefaults);
+var _help = _interopRequireDefault(require("./lib/help"));
 
-var _controlMessageFromOptions = require('./lib/control-message-from-options');
-
-var _controlMessageFromOptions2 = _interopRequireDefault(_controlMessageFromOptions);
-
-var _controlMessage = require('./lib/control-message');
-
-var _controlMessage2 = _interopRequireDefault(_controlMessage);
-
-var _help = require('./lib/help');
-
-var _help2 = _interopRequireDefault(_help);
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var events = new _eventemitter2.default(),
-    device = 'k-mix',
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+let device = 'k-mix',
     options = {},
-    ports = ['k-mix-audio-control', 'k-mix-control-surface'],
-    names = ['bank_1', 'bank_2', 'bank_3', 'mode'],
-    banks = (0, _lodash.initial)(names);
+    ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
+    names = ['bank_1', 'bank_2', 'bank_3', 'mode'];
 
-// debug
+class KMIX extends _eventemitter.default {
+  constructor(midi, userOptions = {}, debug = false) {
+    super();
 
+    _defineProperty(this, "help", (() => (0, _lodash.partial)(_help.default, options))());
 
-// modules
-// vendor
-var kmixLog = document.querySelector('#kmixlog');
+    this.midi = midi;
+    this._debug = debug;
+    this.banks = (0, _lodash.initial)(names);
+    let newOptions = (0, _utilities.convertOptions)(userOptions, names); // make options
 
-var KMIX = function KMIX(midi) {
-	var userOptions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-	var debug = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+    this.options = (0, _lodash.merge)(_kmixDefaults.default, newOptions); // make devices object
 
-	if (!midi) {
-		throw 'MIDI Access object is mandatory.';
-	}
+    this.devices = (0, _midiPorts.default)(this.midi, _deviceData.default); // set message handlers
 
-	var newOptions = (0, _utilities.convertOptions)(userOptions, names);
-	// make options
-	options = (0, _lodash.merge)(_kmixDefaults2.default, newOptions);
-	// make devices object
-	var devices = (0, _midiPorts2.default)(midi, _deviceData2.default);
-	// set message handlers
-	var input = midi.inputs.get(devices[device][ports[1]].inputID);
+    this.input = this.midi.inputs.get(this.devices[device][ports[1]].inputID);
+    this.output = this.midi.outputs.get(this.devices[device][ports[1]].outputID);
+    this.audioControl = {
+      input: this.midi.inputs.get(this.devices[device][ports[0]].inputID),
+      output: this.midi.outputs.get(this.devices[device][ports[0]].outputID)
+    };
+    this.controlSurface = {
+      input: this.midi.inputs.get(this.devices[device][ports[1]].inputID),
+      output: this.midi.outputs.get(this.devices[device][ports[1]].outputID)
+    };
+    this.expander = {
+      input: this.midi.inputs.get(this.devices[device][ports[2]].inputID),
+      output: this.midi.outputs.get(this.devices[device][ports[2]].outputID) // debug
 
-	if (debug) {
-		var inputDebug = midi.inputs.get(devices[device][ports[0]].inputID);
-		inputDebug.onmidimessage = function (e) {
-			// add formatted console logging
-			midiEventHandler(e, true);
-		};
-		input.onmidimessage = function (e) {
-			// add formatted console logging
-			midiEventHandler(e, true);
-		};
-	} else {
-		input.onmidimessage = midiEventHandler;
-	}
+    };
 
-	return {
-		on: function on(event, data) {
-			events.on(event, data);
-			// chaining
-			return this;
-		},
-		emit: function emit(event, data) {
-			events.emit(event, data);
-			// chaining
-			return this;
-		},
-		send: function send(control, value, time) {
-			var bank = arguments.length <= 3 || arguments[3] === undefined ? 1 : arguments[3];
+    if (this._debug) {
+      this.inputDebug = this.midi.inputs.get(this.devices[device][ports[0]].inputID);
 
-			var output = void 0,
-			    message = void 0,
-			    port = ports[0],
-			    controlType = (0, _controlMessage.getControlType)(control);
+      this.inputDebug.onmidimessage = e => {
+        // add formatted console logging
+        (0, _midiMessageHandler.default)(e, this);
+      };
+    } else {
+      this.input.onmidimessage = e => {
+        // add formatted console logging
+        (0, _midiMessageHandler.default)(e, this);
+      };
+    }
+  }
 
-			time = time || 0;
+  send(control, value, bank = 1, time = 0) {
+    let output,
+        message,
+        sendTime,
+        port = ports[0],
+        controlType = (0, _controlMessage.getControlType)(control);
+    sendTime = time;
 
-			switch (controlType) {
-				case 'raw':
-					// raw : send([176,1,127], time)
-					message = control;
-					time = value || 0;
-					port = ports[0];
+    switch (controlType) {
+      case 'raw':
+        // raw : send([176,1,127], time)
+        message = control;
+        time = value || 0;
+        port = ports[0];
+        break;
 
-					break;
+      case 'raw-control':
+        // raw-control : send('control',[176,1,127], time)
+        message = value;
+        port = ports[1];
+        break;
 
-				case 'raw-control':
-					// raw-control : send('control',[176,1,127], time)
-					message = value;
-					port = ports[1];
+      case 'control':
+        // to control-surface : send('control:button-vu',0), send('control:fader-1', 64)
+        port = ports[1];
+        control = control.split(':')[1];
+        message = (0, _controlMessageFromOptions.default)(control, value, bank, options);
+        break;
 
-					break;
+      case 'raw-expander':
+        port = ports[2];
+        control = control.split(':')[1];
+        message = value;
 
-				case 'control':
-					// to control-surface : send('control:button-vu',0), send('control:fader-1', 64)
-					port = ports[1];
-					control = control.split(':')[1];
-					message = (0, _controlMessageFromOptions2.default)(control, value, bank, options);
+      case 'expander':
+        port = ports[2];
+        control = control.split(':')[1];
+        message = value;
 
-					break;
+      default:
+        // 'input', 'main', 'misc', 'preset'
+        // to audio control : send('fader:1', value, time)
+        message = (0, _controlMessage.default)(control, value, controlType);
+        break;
+    }
 
-				default:
-					// 'input', 'main', 'misc', 'preset'
-					// to audio control : send('fader:1', value, time)
-					message = (0, _controlMessage2.default)(control, value, controlType);
+    if (message.length < 3 && controlType !== 'preset') {
+      console.log('Please check control name');
+    } else {
+      this.output.send(message, window.performance.now() + sendTime);
+    }
+  }
 
-					break;
-			}
-
-			output = midi.outputs.get(devices[device][port].outputID);
-
-			if (message.length < 3 && controlType !== 'preset') {
-				console.log('Please check control name');
-			} else {
-				output.send(message, window.performance.now() + time);
-			}
-			// chaining
-			return this;
-		},
-		help: (0, _lodash.partial)(_help2.default, options)
-	};
-};
-
-function midiEventHandler(e) {
-	var debug = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-	var data = e.data,
-	    type = data[0] & 0xf0,
-	    channel = data[0] & 0xf,
-	    control = data[1],
-	    bank = (0, _controlMessage.findBank)(banks, channel, options),
-	    port = '',
-	    controlName = '',
-	    kind = '';
-
-	port = e.target.name;
-
-	// find control; 'fader-1'
-	controlName = (0, _controlMessage.findControl)(control, type, bank, options);
-	// emit ':off' if 128
-	if (type === 128) kind = ':off';
-	// send out event for controlName
-	events.emit(controlName + kind, payload(data));
-	// if listening for any event
-	if (events.listeners('any', true)) {
-		events.emit('any', anyPayload(controlName + kind, data));
-	}
-
-	// debug to console
-	if (debug) {
-		var debugLog = {
-			'control:': controlName,
-			'port:': port,
-			'portID:': e.target.id,
-			'data:': data,
-			'channel:': channel + 1
-		};
-
-		if (port === 'K-Mix Audio Control') {
-			debugLog = (0, _lodash.omit)(debugLog, 'control:');
-			debugLog['channel:'] = data[7] + 1;
-		}
-
-		console.log('Event Debug', debugLog);
-	}
-	if (kmixLog) kmixLog.innerHTML = controlName + '<br>from ' + port + '<br>portID ' + e.target.id + '<br>' + data + '<br>channel ' + (channel + 1);
-}
-
-function payload(data) {
-	var value = data[2];
-	return {
-		value: value,
-		raw: data
-	};
-}
-
-function anyPayload(control, data) {
-	var value = data[2];
-	return {
-		control: control,
-		value: value,
-		raw: data
-	};
 }
 
 exports.default = KMIX;

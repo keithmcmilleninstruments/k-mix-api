@@ -9,13 +9,12 @@ let messages = [input_channel_params, main_output_bus_params, misc_params];
 
 function findControl(value, eventType, bank, options){
 	return findKey(options, function(o) {
-		return findIndex(eventType, o.type) != -1 && isEqual(o[bank], value); 
+		return findIndex(eventType, o.type) != -1 && isEqual(o[bank], value);
 	});
 }
 
 function findIndex(value, array){
-	let index = indexOf(array, value);
-	return index;
+	return indexOf(array, value);
 }
 
 function findBank(banks, channel, options){
@@ -33,12 +32,16 @@ function getControlType(control){
 			controlType = 'raw-control'
 		} else if(controlSplit[0] === 'control'){ // control
 			controlType = 'control'
+		} else if(control === 'expander'){ // raw-expander
+			controlType = 'raw-expander'
+		} else if(controlSplit[0] === 'expander'){ // expander
+			controlType = 'expander'
 		} else if(!isNaN(controlSplit[1])){ // input
 			controlType = 'input'
 		} else { // main, misc, preset
 			controlType = controlSplit[0]
 		}
-	} 
+	}
 
 	return controlType
 }
@@ -46,7 +49,7 @@ function getControlType(control){
 function controlMessage(control, value, messageType = 'input'){
 	let messageTypes = ['input', 'main', 'misc', 'preset'],
 			channelTypes = [1, 9, 10, 1],
-			controlSplit = control.split(':'), 
+			controlSplit = control.split(':'),
 			controlName,
 			inputChannel,
 			type, cc;
@@ -76,4 +79,4 @@ function controlMessage(control, value, messageType = 'input'){
 	return without(message, undefined, null);
 }
 
-export { controlMessage as default, findControl, getControlType, findBank, findBank, messages };
+export { controlMessage as default, findControl, getControlType, findBank, messages };
