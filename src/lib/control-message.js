@@ -14,8 +14,7 @@ function findControl(value, eventType, bank, options){
 }
 
 function findIndex(value, array){
-	let index = indexOf(array, value);
-	return index;
+	return indexOf(array, value);
 }
 
 function findBank(banks, channel, options){

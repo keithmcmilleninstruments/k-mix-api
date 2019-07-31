@@ -30,20 +30,33 @@ export default class KMIX extends EventEmitter {
 		this.devices = createDeviceList(this.midi, deviceData)
 		// set message handlers
 		this.input = this.midi.inputs.get(this.devices[device][ports[1]].inputID)
+		this.output = this.midi.outputs.get(this.devices[device][ports[1]].outputID)
+
+		this.audioControl = {
+			input : this.midi.inputs.get(this.devices[device][ports[0]].inputID),
+			output : this.midi.outputs.get(this.devices[device][ports[0]].outputID)
+		}
+		this.controlSurface = {
+			input : this.midi.inputs.get(this.devices[device][ports[1]].inputID),
+			output : this.midi.outputs.get(this.devices[device][ports[1]].outputID)
+		}
+		this.expander = {
+			input : this.midi.inputs.get(this.devices[device][ports[2]].inputID),
+			output : this.midi.outputs.get(this.devices[device][ports[2]].outputID)
+		}
 
 		// debug
 		if(this._debug){
 			this.inputDebug = this.midi.inputs.get(this.devices[device][ports[0]].inputID)
-			this.inputDebug.onmidimessage = function(e){
+			this.inputDebug.onmidimessage = (e) => {
 				// add formatted console logging
-				midiEventHandler(e, true)
-			}
-			this.input.onmidimessage = function(e){
-				// add formatted console logging
-				midiEventHandler(e, true)
+				midiMessageHandler(e, this)
 			}
 		} else {
-			this.input.onmidimessage = midiEventHandler
+			this.input.onmidimessage = (e) => {
+				// add formatted console logging
+				midiMessageHandler(e, this)
+			}
 		}
 	}
 
@@ -94,8 +107,6 @@ export default class KMIX extends EventEmitter {
 
 				break;
 		}
-
-		this.output = this.midi.outputs.get(devices[device][port].outputID)
 
 		if(message.length < 3 && controlType !== 'preset') {
 			console.log('Please check control name');
