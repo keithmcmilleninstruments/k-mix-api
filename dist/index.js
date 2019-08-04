@@ -52,7 +52,7 @@ class KMIX extends _eventemitter.default {
     this.devices = (0, _midiPorts.default)(this.midi, _deviceData.default); // set message handlers
 
     this.input = this.midi.inputs.get(this.devices[device][ports[1]].inputID);
-    this.output = this.midi.outputs.get(this.devices[device][ports[1]].outputID);
+    this.output = this.midi.outputs.get(this.devices[device][ports[0]].outputID);
     this.audioControl = {
       input: this.midi.inputs.get(this.devices[device][ports[0]].inputID),
       output: this.midi.outputs.get(this.devices[device][ports[0]].outputID)
