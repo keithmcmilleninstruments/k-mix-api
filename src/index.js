@@ -30,7 +30,7 @@ export default class KMIX extends EventEmitter {
 		this.devices = createDeviceList(this.midi, deviceData)
 		// set message handlers
 		this.input = this.midi.inputs.get(this.devices[device][ports[1]].inputID)
-		this.output = this.midi.outputs.get(this.devices[device][ports[1]].outputID)
+		this.output = this.midi.outputs.get(this.devices[device][ports[0]].outputID)
 
 		this.audioControl = {
 			input : this.midi.inputs.get(this.devices[device][ports[0]].inputID),
