@@ -8,7 +8,7 @@ export default {
 	"fader-6": {"bank_1": 6, "bank_2": 6, "bank_3": 6, "type": [176]},
 	"fader-7": {"bank_1": 7, "bank_2": 7, "bank_3": 7, "type": [176]},
 	"fader-8": {"bank_1": 8, "bank_2": 8, "bank_3": 8, "type": [176]},
-	"fader-master": {"bank_1": 9, "bank_2": 9, "bank_3": 9, "type": [176]},
+	"fader-main": {"bank_1": 9, "bank_2": 9, "bank_3": 9, "type": [176]},
 	"rotary-1": {"bank_1": 10, "bank_2": 10, "bank_3": 10, "type": [176]},
 	"rotary-2": {"bank_1": 11, "bank_2": 11, "bank_3": 11, "type": [176]},
 	"rotary-3": {"bank_1": 12, "bank_2": 12, "bank_3": 12, "type": [176]},
@@ -38,9 +38,9 @@ export default {
 	"channel-select-6": {"bank_1": 6, "bank_2": 6, "bank_3": 6, "mode": "momentary", "type": [144, 128]},
 	"channel-select-7": {"bank_1": 7, "bank_2": 7, "bank_3": 7, "mode": "momentary", "type": [144, 128]},
 	"channel-select-8": {"bank_1": 8, "bank_2": 8, "bank_3": 8, "mode": "momentary", "type": [144, 128]},
-	"channel-select-master": {"bank_1": 9, "bank_2": 9, "bank_3": 9, "mode": "momentary", "type": [144, 128]},
-	"diamond-up": {"bank_1": 26, "bank_2": 26, "bank_3": 26, "mode": "momentary", "type": [144, 128]},
-	"diamond-down": {"bank_1": 27, "bank_2": 27, "bank_3": 27, "mode": "momentary", "type": [144, 128]},
-	"diamond-left": {"bank_1": 28, "bank_2": 28, "bank_3": 28, "mode": "momentary", "type": [144, 128]},
-	"diamond-right": {"bank_1": 29, "bank_2": 29, "bank_3": 29, "mode": "momentary", "type": [144, 128]}
+	"channel-select-main": {"bank_1": 9, "bank_2": 9, "bank_3": 9, "mode": "momentary", "type": [144, 128]},
+	"transport-up": {"bank_1": 26, "bank_2": 26, "bank_3": 26, "mode": "momentary", "type": [144, 128]},
+	"transport-down": {"bank_1": 27, "bank_2": 27, "bank_3": 27, "mode": "momentary", "type": [144, 128]},
+	"transport-left": {"bank_1": 28, "bank_2": 28, "bank_3": 28, "mode": "momentary", "type": [144, 128]},
+	"transport-right": {"bank_1": 29, "bank_2": 29, "bank_3": 29, "mode": "momentary", "type": [144, 128]}
 };

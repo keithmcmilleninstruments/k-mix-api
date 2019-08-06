@@ -54,7 +54,7 @@ var _default = {
     "bank_3": 8,
     "type": [176]
   },
-  "fader-master": {
+  "fader-main": {
     "bank_1": 9,
     "bank_2": 9,
     "bank_3": 9,
@@ -252,35 +252,35 @@ var _default = {
     "mode": "momentary",
     "type": [144, 128]
   },
-  "channel-select-master": {
+  "channel-select-main": {
     "bank_1": 9,
     "bank_2": 9,
     "bank_3": 9,
     "mode": "momentary",
     "type": [144, 128]
   },
-  "diamond-up": {
+  "transport-up": {
     "bank_1": 26,
     "bank_2": 26,
     "bank_3": 26,
     "mode": "momentary",
     "type": [144, 128]
   },
-  "diamond-down": {
+  "transport-down": {
     "bank_1": 27,
     "bank_2": 27,
     "bank_3": 27,
     "mode": "momentary",
     "type": [144, 128]
   },
-  "diamond-left": {
+  "transport-left": {
     "bank_1": 28,
     "bank_2": 28,
     "bank_3": 28,
     "mode": "momentary",
     "type": [144, 128]
   },
-  "diamond-right": {
+  "transport-right": {
     "bank_1": 29,
     "bank_2": 29,
     "bank_3": 29,
