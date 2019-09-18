@@ -7,6 +7,7 @@ import { isEqual, convertOptions, arraysToObject, helpObject } from './lib/utili
 import deviceData from './lib/device-data';
 import kmixDefaults from "./lib/kmix-defaults";
 import midiMessageHandler from "./lib/midiMessageHandler";
+import stateChangeHandler from "./lib/stateChangeHandler";
 import controlMessageFromOptions from './lib/control-message-from-options';
 import { default as controlMessage, getControlType, findControl, findBank, findIndex } from "./lib/control-message";
 import help from "./lib/help";
@@ -44,6 +45,10 @@ export default class KMIX extends EventEmitter {
 			input : this.midi.inputs.get(this.devices[device][ports[2]].inputID),
 			output : this.midi.outputs.get(this.devices[device][ports[2]].outputID)
 		}
+
+		this.midi.onstatechange = (e) => stateChangeHandler(e, this)
+
+		if(!this.input) return
 
 		// debug
 		if(this._debug){

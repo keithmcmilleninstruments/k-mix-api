@@ -19,6 +19,8 @@ var _kmixDefaults = _interopRequireDefault(require("./lib/kmix-defaults"));
 
 var _midiMessageHandler = _interopRequireDefault(require("./lib/midiMessageHandler"));
 
+var _stateChangeHandler = _interopRequireDefault(require("./lib/stateChangeHandler"));
+
 var _controlMessageFromOptions = _interopRequireDefault(require("./lib/control-message-from-options"));
 
 var _controlMessage = _interopRequireWildcard(require("./lib/control-message"));
@@ -63,9 +65,12 @@ class KMIX extends _eventemitter.default {
     };
     this.expander = {
       input: this.midi.inputs.get(this.devices[device][ports[2]].inputID),
-      output: this.midi.outputs.get(this.devices[device][ports[2]].outputID) // debug
-
+      output: this.midi.outputs.get(this.devices[device][ports[2]].outputID)
     };
+
+    this.midi.onstatechange = e => (0, _stateChangeHandler.default)(e, this);
+
+    if (!this.input) return; // debug
 
     if (this._debug) {
       this.inputDebug = this.midi.inputs.get(this.devices[device][ports[0]].inputID);
