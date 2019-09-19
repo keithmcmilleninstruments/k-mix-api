@@ -21,7 +21,7 @@ function stateChangeHandler(event, device) {
       break;
 
     case 'K-Mix Control Surface':
-      portName = 'controlsurface';
+      portName = 'controlSurface';
       break;
 
     case 'K-Mix Expander':
