@@ -42,9 +42,55 @@ class KMIX extends _eventemitter.default {
   constructor(midi, userOptions = {}, debug = false) {
     super();
 
+    _defineProperty(this, "isConnected", (port = 'all') => {
+      switch (port) {
+        case 'all':
+          return Object.values(this.connections).every(port => port.input && port.output);
+
+        case 'audio-control':
+          return Object.values(this.connections).every(port => {
+            if (port !== 'audioControl') return;
+            return port.input && port.output;
+          });
+
+        case 'control-surface':
+          return Object.values(this.connections).every(port => {
+            if (port !== 'controlSurface') return;
+            return port.input && port.output;
+          });
+
+        case 'expander':
+          return Object.values(this.connections).every(port => {
+            if (port !== 'expander') return;
+            return port.input && port.output;
+          });
+
+        default:
+          return false;
+      }
+    });
+
     _defineProperty(this, "help", (() => (0, _lodash.partial)(_help.default, options))());
 
+    this.deviceName = 'K-Mix';
+    this.connections = {
+      audioControl: {
+        input: false,
+        output: false
+      },
+      controlSurface: {
+        input: false,
+        output: false
+      },
+      expander: {
+        input: false,
+        output: false
+      }
+    };
     this.midi = midi;
+
+    this.midi.onstatechange = e => (0, _stateChangeHandler.default)(e, this);
+
     this._debug = debug;
     this.banks = (0, _lodash.initial)(names);
     let newOptions = (0, _utilities.convertOptions)(userOptions, names); // make options
@@ -55,6 +101,7 @@ class KMIX extends _eventemitter.default {
 
     this.input = this.midi.inputs.get(this.devices[device][ports[1]].inputID);
     this.output = this.midi.outputs.get(this.devices[device][ports[0]].outputID);
+    if (!this.input) return;
     this.audioControl = {
       input: this.midi.inputs.get(this.devices[device][ports[0]].inputID),
       output: this.midi.outputs.get(this.devices[device][ports[0]].outputID)
@@ -65,12 +112,9 @@ class KMIX extends _eventemitter.default {
     };
     this.expander = {
       input: this.midi.inputs.get(this.devices[device][ports[2]].inputID),
-      output: this.midi.outputs.get(this.devices[device][ports[2]].outputID)
+      output: this.midi.outputs.get(this.devices[device][ports[2]].outputID) // debug
+
     };
-
-    this.midi.onstatechange = e => (0, _stateChangeHandler.default)(e, this);
-
-    if (!this.input) return; // debug
 
     if (this._debug) {
       this.inputDebug = this.midi.inputs.get(this.devices[device][ports[0]].inputID);

@@ -19,7 +19,18 @@ let device = 'k-mix', options = {},
 export default class KMIX extends EventEmitter {
 	constructor(midi, userOptions = {}, debug = false){
 		super()
+
+		this.deviceName = 'K-Mix'
+
+		this.connections = {
+			audioControl: {input: false, output: false},
+			controlSurface: {input: false, output: false},
+			expander: {input: false, output: false}
+		}
+
 		this.midi = midi
+		this.midi.onstatechange = (e) => stateChangeHandler(e, this)
+
 		this._debug = debug
 
 		this.banks = initial(names)
@@ -29,9 +40,12 @@ export default class KMIX extends EventEmitter {
 		this.options = merge(kmixDefaults, newOptions)
 		// make devices object
 		this.devices = createDeviceList(this.midi, deviceData)
+
 		// set message handlers
 		this.input = this.midi.inputs.get(this.devices[device][ports[1]].inputID)
 		this.output = this.midi.outputs.get(this.devices[device][ports[0]].outputID)
+
+		if(!this.input) return
 
 		this.audioControl = {
 			input : this.midi.inputs.get(this.devices[device][ports[0]].inputID),
@@ -45,10 +59,6 @@ export default class KMIX extends EventEmitter {
 			input : this.midi.inputs.get(this.devices[device][ports[2]].inputID),
 			output : this.midi.outputs.get(this.devices[device][ports[2]].outputID)
 		}
-
-		this.midi.onstatechange = (e) => stateChangeHandler(e, this)
-
-		if(!this.input) return
 
 		// debug
 		if(this._debug){
@@ -117,6 +127,30 @@ export default class KMIX extends EventEmitter {
 			console.log('Please check control name');
 		} else {
 			this.output.send(message,  window.performance.now() + sendTime)
+		}
+	}
+
+	isConnected = (port = 'all') => {
+		switch (port) {
+			case 'all':
+				return Object.values(this.connections).every(port => port.input && port.output)
+			case 'audio-control':
+				return Object.values(this.connections).every(port => {
+					if(port !== 'audioControl') return
+					return port.input && port.output
+				})
+			case 'control-surface':
+			return Object.values(this.connections).every(port => {
+				if(port !== 'controlSurface') return
+				return port.input && port.output
+			})
+			case 'expander':
+			return Object.values(this.connections).every(port => {
+				if(port !== 'expander') return
+				return port.input && port.output
+			})
+			default:
+				return false
 		}
 	}
 
