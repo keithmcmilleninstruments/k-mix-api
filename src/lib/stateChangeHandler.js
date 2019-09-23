@@ -34,7 +34,7 @@ export default function stateChangeHandler(event, device) {
     device.emit('connected')
   }
   // disconnected
-  if(Object.values(device.connections).every(p => !port.input && !port.output)) {
+  if(Object.values(device.connections).every(port => !port.input && !port.output)) {
     device.emit('disconnected')
   }
 

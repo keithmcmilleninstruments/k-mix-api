@@ -44,7 +44,7 @@ function stateChangeHandler(event, device) {
   } // disconnected
 
 
-  if (Object.values(device.connections).every(p => !port.input && !port.output)) {
+  if (Object.values(device.connections).every(port => !port.input && !port.output)) {
     device.emit('disconnected');
   }
 }
