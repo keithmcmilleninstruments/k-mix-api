@@ -23,7 +23,15 @@ export default class KMIX extends EventEmitter {
 		this.deviceName = 'K-Mix'
 		this._debug = debug
 		// store port connection status
-		this.connections = {}
+		this.connections = {
+			audioControl: {input: false, output: false},
+			controlSurface: {input: false, output: false},
+			expander: {input: false, output: false}
+		}
+
+		this.audioControl = {input: null, output: null}
+		this.controlSurface = {input: null, output: null}
+		this.expander = {input: null, output: null}
 
 		this.midi = midi
 		// set statechange handler
