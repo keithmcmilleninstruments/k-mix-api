@@ -74,6 +74,6 @@ function storePortConnections(port, device) {
   } = port;
   if (!name.includes(device.deviceName)) return;
   const cleanName = (0, _camelcase.default)(name.replace(`${device.deviceName} `, ''));
-  device.connections[cleanName][type]['connected'] = state === 'connected' ? true : false;
+  device.connections[cleanName][type] = state === 'connected' ? true : false;
   device[cleanName][type] = port;
 }

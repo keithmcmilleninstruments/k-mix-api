@@ -58,7 +58,7 @@ export function storePortConnections(port, device) {
 
 	const cleanName = camelcase(name.replace(`${device.deviceName} `,''))
 
-	device.connections[cleanName][type]['connected'] = state === 'connected' ? true : false
+	device.connections[cleanName][type] = state === 'connected' ? true : false
 
 	device[cleanName][type] = port
 }
