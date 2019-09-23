@@ -3,7 +3,7 @@ import { merge, initial, partial } from "lodash"
 
 // modules
 import createDeviceList from 'midi-ports';
-import { isEqual, convertOptions, arraysToObject, helpObject } from './lib/utilities'
+import { storePortConnections, isEqual, convertOptions, arraysToObject, helpObject } from './lib/utilities'
 import deviceData from './lib/device-data';
 import kmixDefaults from "./lib/kmix-defaults";
 import midiMessageHandler from "./lib/midiMessageHandler";
@@ -21,17 +21,13 @@ export default class KMIX extends EventEmitter {
 		super()
 
 		this.deviceName = 'K-Mix'
-
-		this.connections = {
-			audioControl: {input: false, output: false},
-			controlSurface: {input: false, output: false},
-			expander: {input: false, output: false}
-		}
+		this._debug = debug
+		// store port connection status
+		this.connections = {}
 
 		this.midi = midi
+		// set statechange handler
 		this.midi.onstatechange = (e) => stateChangeHandler(e, this)
-
-		this._debug = debug
 
 		this.banks = initial(names)
 
@@ -41,33 +37,24 @@ export default class KMIX extends EventEmitter {
 		// make devices object
 		this.devices = createDeviceList(this.midi, deviceData)
 
-		// set message handlers
-		this.input = this.midi.inputs.get(this.devices[device][ports[1]].inputID)
-		this.output = this.midi.outputs.get(this.devices[device][ports[0]].outputID)
+		// store ports and connecitons
+		this.midi.inputs.forEach(input => storePortConnections(input, this))
+		this.midi.outputs.forEach(output => storePortConnections(output, this))
 
-		if(!this.input) return
+		if(!this.controlSurface.input) return
 
-		this.audioControl = {
-			input : this.midi.inputs.get(this.devices[device][ports[0]].inputID),
-			output : this.midi.outputs.get(this.devices[device][ports[0]].outputID)
-		}
-		this.controlSurface = {
-			input : this.midi.inputs.get(this.devices[device][ports[1]].inputID),
-			output : this.midi.outputs.get(this.devices[device][ports[1]].outputID)
-		}
-		this.expander = {
-			input : this.midi.inputs.get(this.devices[device][ports[2]].inputID),
-			output : this.midi.outputs.get(this.devices[device][ports[2]].outputID)
-		}
+		// set main ports
+		this.input = this.controlSurface.input
+		this.output = this.audioControl.output
 
 		// debug
 		if(this._debug){
-			this.inputDebug = this.midi.inputs.get(this.devices[device][ports[0]].inputID)
+			this.inputDebug = this.audioControl.input
 			this.inputDebug.onmidimessage = (e) => {
 				// add formatted console logging
 				midiMessageHandler(e, this)
 			}
-		} else {
+		} else { // set event handler
 			this.input.onmidimessage = (e) => {
 				// add formatted console logging
 				midiMessageHandler(e, this)
@@ -124,7 +111,7 @@ export default class KMIX extends EventEmitter {
 		}
 
 		if(message.length < 3 && controlType !== 'preset') {
-			console.log('Please check control name');
+			console.warn('>> K-Mix: Please check control name');
 		} else {
 			this.output.send(message,  window.performance.now() + sendTime)
 		}

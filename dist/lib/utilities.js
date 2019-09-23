@@ -10,8 +10,13 @@ exports.arraysToObject = arraysToObject;
 exports.convertRange = convertRange;
 exports.payload = payload;
 exports.anyPayload = anyPayload;
+exports.storePortConnections = storePortConnections;
+
+var _camelcase = _interopRequireDefault(require("camelcase"));
 
 var _lodash = require("lodash");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function isEqual(a, b) {
   return a === b;
@@ -58,4 +63,17 @@ function anyPayload(control, data) {
     value: value,
     raw: data
   };
+} // device connection and port storing
+
+
+function storePortConnections(port, device) {
+  const {
+    name,
+    type,
+    state
+  } = port;
+  if (!name.includes(device.deviceName)) return;
+  const cleanName = (0, _camelcase.default)(name.replace(`${device.deviceName} `, ''));
+  device.connections[cleanName][type]['connected'] = state === 'connected' ? true : false;
+  device[cleanName][type] = port;
 }

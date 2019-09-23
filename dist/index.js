@@ -73,57 +73,36 @@ class KMIX extends _eventemitter.default {
     _defineProperty(this, "help", (() => (0, _lodash.partial)(_help.default, options))());
 
     this.deviceName = 'K-Mix';
-    this.connections = {
-      audioControl: {
-        input: false,
-        output: false
-      },
-      controlSurface: {
-        input: false,
-        output: false
-      },
-      expander: {
-        input: false,
-        output: false
-      }
-    };
-    this.midi = midi;
+    this._debug = debug; // store port connection status
+
+    this.connections = {};
+    this.midi = midi; // set statechange handler
 
     this.midi.onstatechange = e => (0, _stateChangeHandler.default)(e, this);
 
-    this._debug = debug;
     this.banks = (0, _lodash.initial)(names);
     let newOptions = (0, _utilities.convertOptions)(userOptions, names); // make options
 
     this.options = (0, _lodash.merge)(_kmixDefaults.default, newOptions); // make devices object
 
-    this.devices = (0, _midiPorts.default)(this.midi, _deviceData.default); // set message handlers
+    this.devices = (0, _midiPorts.default)(this.midi, _deviceData.default); // store ports and connecitons
 
-    this.input = this.midi.inputs.get(this.devices[device][ports[1]].inputID);
-    this.output = this.midi.outputs.get(this.devices[device][ports[0]].outputID);
-    if (!this.input) return;
-    this.audioControl = {
-      input: this.midi.inputs.get(this.devices[device][ports[0]].inputID),
-      output: this.midi.outputs.get(this.devices[device][ports[0]].outputID)
-    };
-    this.controlSurface = {
-      input: this.midi.inputs.get(this.devices[device][ports[1]].inputID),
-      output: this.midi.outputs.get(this.devices[device][ports[1]].outputID)
-    };
-    this.expander = {
-      input: this.midi.inputs.get(this.devices[device][ports[2]].inputID),
-      output: this.midi.outputs.get(this.devices[device][ports[2]].outputID) // debug
+    this.midi.inputs.forEach(input => (0, _utilities.storePortConnections)(input, this));
+    this.midi.outputs.forEach(output => (0, _utilities.storePortConnections)(output, this));
+    if (!this.controlSurface.input) return; // set main ports
 
-    };
+    this.input = this.controlSurface.input;
+    this.output = this.audioControl.output; // debug
 
     if (this._debug) {
-      this.inputDebug = this.midi.inputs.get(this.devices[device][ports[0]].inputID);
+      this.inputDebug = this.audioControl.input;
 
       this.inputDebug.onmidimessage = e => {
         // add formatted console logging
         (0, _midiMessageHandler.default)(e, this);
       };
     } else {
+      // set event handler
       this.input.onmidimessage = e => {
         // add formatted console logging
         (0, _midiMessageHandler.default)(e, this);
@@ -178,7 +157,7 @@ class KMIX extends _eventemitter.default {
     }
 
     if (message.length < 3 && controlType !== 'preset') {
-      console.log('Please check control name');
+      console.warn('>> K-Mix: Please check control name');
     } else {
       this.output.send(message, window.performance.now() + sendTime);
     }

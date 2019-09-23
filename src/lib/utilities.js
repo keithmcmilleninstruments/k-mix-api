@@ -1,3 +1,4 @@
+import camelcase from 'camelcase'
 import { isArray, zipObject } from 'lodash';
 
 export function isEqual(a, b){
@@ -43,4 +44,21 @@ export function anyPayload(control, data){
 		value: value,
 		raw: data
 	}
+}
+
+// device connection and port storing
+export function storePortConnections(port, device) {
+	const {
+		name,
+		type,
+		state
+	} = port
+
+	if(!name.includes(device.deviceName)) return
+
+	const cleanName = camelcase(name.replace(`${device.deviceName} `,''))
+
+	device.connections[cleanName][type]['connected'] = state === 'connected' ? true : false
+
+	device[cleanName][type] = port
 }

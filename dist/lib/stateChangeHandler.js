@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = stateChangeHandler;
 
+var _camelcase = _interopRequireDefault(require("camelcase"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function stateChangeHandler(event, device) {
   const {
     name,
@@ -14,18 +18,19 @@ function stateChangeHandler(event, device) {
   let portName = 'error';
   if (!name.includes(device.deviceName)) return;
   if (window._debugStateChange) console.log('>> K-Mix State', event.port);
+  const cleanName = (0, _camelcase.default)(name.replace('K-Mix ', ''));
 
   switch (name) {
     case 'K-Mix Audio Control':
-      portName = 'audioControl';
+      portName = cleanName;
       break;
 
     case 'K-Mix Control Surface':
-      portName = 'controlSurface';
+      portName = cleanName;
       break;
 
     case 'K-Mix Expander':
-      portName = 'expander';
+      portName = cleanName;
       break;
 
     default:
@@ -34,12 +39,12 @@ function stateChangeHandler(event, device) {
 
   device.connections[portName][type] = state === 'connected' ? true : false; // connected
 
-  if (Object.values(device.connections).every(p => p.input && p.output)) {
+  if (Object.values(device.connections).every(port => port.input && port.output)) {
     device.emit('connected');
   } // disconnected
 
 
-  if (Object.values(device.connections).every(p => !p.input && !p.output)) {
+  if (Object.values(device.connections).every(p => !port.input && !port.output)) {
     device.emit('disconnected');
   }
 }

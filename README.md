@@ -69,16 +69,24 @@ You can still control K-Mix's audio parameteres regardless of which mode you're 
 
 ##Events
 
+When _all_ of K-Mix's ports are connected or disconnected, it sends out a 'connected' or 'disconnected' event.
+
+```js
+kmix.on('connected', () => console.log('>> K-Mix: connected'))
+
+kmix.on('disconnected', () => console.log('>> K-Mix: disconnected'))
+```
+
 When K-Mix is in one of 3 MIDI Bank modes it sends out events named for the control that is sending out data. For example, if you move the main fader, an event of 'fader:main' is sent out along with the fader data for that event.
 
 ```js
 // fader-1
 kmix.on('fader-1', (value) => console.log('fader-1', value))
 
- // listen for on/144 button messages. default
+ // listen for on [144] button messages. default
 kmix.on('button-vu', (value) => console.log('button-vu', value))
 
- // listen for off/128 button messages
+ // listen for off [128] button messages
 kmix.on('button-vu:off', (value) => console.log('button-vu:off', value))
 ```
 If you want to listen to events from a large number of controls, you can listen to the 'any' event and build the logic of how to handle the data with conditional / switch statements.
