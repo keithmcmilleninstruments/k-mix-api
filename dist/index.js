@@ -103,8 +103,7 @@ class KMIX extends _eventemitter.default {
     };
     this.midi = midi; // set statechange handler
 
-    this.midi.onstatechange = e => (0, _stateChangeHandler.default)(e, this);
-
+    this.midi.addEventListener('statechange', e => (0, _stateChangeHandler.default)(e, this));
     this.banks = (0, _lodash.initial)(names);
     let newOptions = (0, _utilities.convertOptions)(userOptions, names); // make options
 

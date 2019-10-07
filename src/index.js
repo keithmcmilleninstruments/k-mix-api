@@ -35,7 +35,7 @@ export default class KMIX extends EventEmitter {
 
 		this.midi = midi
 		// set statechange handler
-		this.midi.onstatechange = (e) => stateChangeHandler(e, this)
+		this.midi.addEventListener('statechange', (e) => stateChangeHandler(e, this))
 
 		this.banks = initial(names)
 
