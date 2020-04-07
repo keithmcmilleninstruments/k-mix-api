@@ -70,11 +70,17 @@ You can still control K-Mix's audio parameteres regardless of which mode you're 
 ##Events
 
 When _all_ of K-Mix's ports are connected or disconnected, it sends out a 'connected' or 'disconnected' event.
+You can also query any port connection with the `isConnected(port ='all')` method.
 
 ```js
 kmix.on('connected', () => console.log('>> K-Mix: connected'))
 
 kmix.on('disconnected', () => console.log('>> K-Mix: disconnected'))
+
+kmix.isConnected('all' || 'audio-control' || 'control-surface' || 'expander')
+// --> true when all ports are connected.
+kmix.isConnected('audio-control')
+// --> true when audio-control port is connected
 ```
 
 When K-Mix is in one of 3 MIDI Bank modes it sends out events named for the control that is sending out data. For example, if you move the main fader, an event of 'fader:main' is sent out along with the fader data for that event.
