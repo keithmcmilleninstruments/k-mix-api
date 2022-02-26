@@ -1,15 +1,5 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = stateChangeHandler;
-
-var _camelcase = _interopRequireDefault(require("camelcase"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function stateChangeHandler(event, device) {
+import camelcase from 'camelcase';
+export default function stateChangeHandler(event, device) {
   var _event$port = event.port,
       name = _event$port.name,
       type = _event$port.type,
@@ -17,7 +7,7 @@ function stateChangeHandler(event, device) {
   var portName = 'error';
   if (!name.includes(device.deviceName)) return;
   if (window._debugStateChange) console.log('>> K-Mix State', event.port);
-  var cleanName = (0, _camelcase.default)(name.replace('K-Mix ', ''));
+  var cleanName = camelcase(name.replace('K-Mix ', ''));
 
   switch (name) {
     case 'K-Mix Audio Control':

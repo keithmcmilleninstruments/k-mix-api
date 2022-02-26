@@ -1,9 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.misc_params = exports.main_output_bus_params = exports.input_channel_params = void 0;
 // convert each to Map
 
 /*
@@ -107,7 +101,6 @@ var input_channel_params = {
 • Compressor Makeup Gain = CC 21
 */
 
-exports.input_channel_params = input_channel_params;
 var main_output_bus_params = {
   "fader": 1,
   "mute": 2,
@@ -156,7 +149,6 @@ var main_output_bus_params = {
 • Aux 3 Mute = CC 28
 */
 
-exports.main_output_bus_params = main_output_bus_params;
 var misc_params = {
   "reverb-send-1": 1,
   "reverb-send-2": 2,
@@ -189,4 +181,4 @@ var misc_params = {
 }; // CHANGING PRESETS WITH PROGRAM CHANGE MESSAGES sent to any channel on  K-Mix Audio Control port
 // Program Change : 0xCx; [C0,1] set preset 1
 
-exports.misc_params = misc_params;
+export { input_channel_params, main_output_bus_params, misc_params };

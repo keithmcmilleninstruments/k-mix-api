@@ -1,10 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
 /*
 'device' : {
 	'devicePort': {
@@ -14,7 +7,7 @@ exports.default = void 0;
 	'manufacturer': 'Keith McMillen Instruments'
 }
 */
-var _default = {
+export default {
   'k-mix': {
     'k-mix-audio-control': {
       'name': 'K-Mix Audio Control'
@@ -29,4 +22,3 @@ var _default = {
     'manufacturer': 'keith-mcmillen-instruments'
   }
 };
-exports.default = _default;

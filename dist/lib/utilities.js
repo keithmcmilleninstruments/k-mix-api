@@ -1,36 +1,16 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.anyPayload = anyPayload;
-exports.arraysToObject = arraysToObject;
-exports.convertOptions = convertOptions;
-exports.convertRange = convertRange;
-exports.format = format;
-exports.isEqual = isEqual;
-exports.payload = payload;
-exports.storePortConnections = storePortConnections;
-
-var _camelcase = _interopRequireDefault(require("camelcase"));
-
-var _lodash = require("lodash");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isEqual(a, b) {
+import camelcase from 'camelcase';
+import { isArray, zipObject } from 'lodash';
+export function isEqual(a, b) {
   return a === b;
 }
-
-function format(string) {
+export function format(string) {
   return string.toLowerCase().replace(/\s/g, '-').replace(',', '');
 }
-
-function convertOptions(user, names) {
+export function convertOptions(user, names) {
   var newOptions = {};
 
   for (var o in user) {
-    if (o === 'midi-channels' || !(0, _lodash.isArray)(user[o])) {
+    if (o === 'midi-channels' || !isArray(user[o])) {
       newOptions[o] = user[o];
     } else {
       newOptions[o] = arraysToObject(user[o], names);
@@ -39,24 +19,20 @@ function convertOptions(user, names) {
 
   return newOptions;
 }
-
-function arraysToObject(values, names) {
-  return (0, _lodash.zipObject)(names, values);
+export function arraysToObject(values, names) {
+  return zipObject(names, values);
 }
-
-function convertRange(value, r1, r2) {
+export function convertRange(value, r1, r2) {
   return (value - r1[0]) * (r2[1] - r2[0]) / (r1[1] - r1[0]) + r2[0];
 }
-
-function payload(data) {
+export function payload(data) {
   var value = data[2];
   return {
     value: value,
     raw: data
   };
 }
-
-function anyPayload(control, data) {
+export function anyPayload(control, data) {
   var value = data[2];
   return {
     control: control,
@@ -65,13 +41,12 @@ function anyPayload(control, data) {
   };
 } // device connection and port storing
 
-
-function storePortConnections(port, device) {
+export function storePortConnections(port, device) {
   var name = port.name,
       type = port.type,
       state = port.state;
   if (!name.includes(device.deviceName)) return;
-  var cleanName = (0, _camelcase.default)(name.replace("".concat(device.deviceName, " "), ''));
+  var cleanName = camelcase(name.replace("".concat(device.deviceName, " "), ''));
   device.connections[cleanName][type] = state === 'connected' ? true : false;
   device[cleanName][type] = port;
 }

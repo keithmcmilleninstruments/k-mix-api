@@ -3,16 +3,16 @@ import { merge, initial, partial } from "lodash"
 
 // modules
 import createDeviceList from 'midi-ports';
-import { storePortConnections, isEqual, convertOptions, arraysToObject, helpObject } from './lib/utilities'
+import { storePortConnections, convertOptions } from './lib/utilities'
 import deviceData from './lib/device-data';
 import kmixDefaults from "./lib/kmix-defaults";
 import midiMessageHandler from "./lib/midiMessageHandler";
 import stateChangeHandler from "./lib/stateChangeHandler";
 import controlMessageFromOptions from './lib/control-message-from-options';
-import { default as controlMessage, getControlType, findControl, findBank, findIndex } from "./lib/control-message";
+import { default as controlMessage, getControlType } from "./lib/control-message";
 import help from "./lib/help";
 
-let device = 'k-mix', options = {},
+let options = {},
 		ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
 		names = ['bank_1', 'bank_2', 'bank_3', 'mode']
 
@@ -71,8 +71,7 @@ export default class KMIX extends EventEmitter {
 	}
 
 	send(control, value, bank = 1, time = 0) {
-		let output, message, sendTime,
-				port = ports[0],
+		let message, sendTime,
 				controlType = getControlType(control);
 
 		sendTime = time
