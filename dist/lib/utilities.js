@@ -1,79 +1,90 @@
-"use strict";
+(function (global, factory) {
+  if (typeof define === "function" && define.amd) {
+    define(["exports", "camelcase", "lodash"], factory);
+  } else if (typeof exports !== "undefined") {
+    factory(exports, require("camelcase"), require("lodash"));
+  } else {
+    var mod = {
+      exports: {}
+    };
+    factory(mod.exports, global.camelcase, global.lodash);
+    global.utilities = mod.exports;
+  }
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _camelcase, _lodash) {
+  "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.isEqual = isEqual;
-exports.format = format;
-exports.convertOptions = convertOptions;
-exports.arraysToObject = arraysToObject;
-exports.convertRange = convertRange;
-exports.payload = payload;
-exports.anyPayload = anyPayload;
-exports.storePortConnections = storePortConnections;
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.anyPayload = anyPayload;
+  _exports.arraysToObject = arraysToObject;
+  _exports.convertOptions = convertOptions;
+  _exports.convertRange = convertRange;
+  _exports.format = format;
+  _exports.isEqual = isEqual;
+  _exports.payload = payload;
+  _exports.storePortConnections = storePortConnections;
+  _camelcase = _interopRequireDefault(_camelcase);
 
-var _camelcase = _interopRequireDefault(require("camelcase"));
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _lodash = require("lodash");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function isEqual(a, b) {
-  return a === b;
-}
-
-function format(string) {
-  return string.toLowerCase().replace(/\s/g, '-').replace(',', '');
-}
-
-function convertOptions(user, names) {
-  let newOptions = {};
-
-  for (let o in user) {
-    if (o === 'midi-channels' || !(0, _lodash.isArray)(user[o])) {
-      newOptions[o] = user[o];
-    } else {
-      newOptions[o] = arraysToObject(user[o], names);
-    }
+  function isEqual(a, b) {
+    return a === b;
   }
 
-  return newOptions;
-}
+  function format(string) {
+    return string.toLowerCase().replace(/\s/g, '-').replace(',', '');
+  }
 
-function arraysToObject(values, names) {
-  return (0, _lodash.zipObject)(names, values);
-}
+  function convertOptions(user, names) {
+    let newOptions = {};
 
-function convertRange(value, r1, r2) {
-  return (value - r1[0]) * (r2[1] - r2[0]) / (r1[1] - r1[0]) + r2[0];
-}
+    for (let o in user) {
+      if (o === 'midi-channels' || !(0, _lodash.isArray)(user[o])) {
+        newOptions[o] = user[o];
+      } else {
+        newOptions[o] = arraysToObject(user[o], names);
+      }
+    }
 
-function payload(data) {
-  let value = data[2];
-  return {
-    value: value,
-    raw: data
-  };
-}
+    return newOptions;
+  }
 
-function anyPayload(control, data) {
-  let value = data[2];
-  return {
-    control: control,
-    value: value,
-    raw: data
-  };
-} // device connection and port storing
+  function arraysToObject(values, names) {
+    return (0, _lodash.zipObject)(names, values);
+  }
+
+  function convertRange(value, r1, r2) {
+    return (value - r1[0]) * (r2[1] - r2[0]) / (r1[1] - r1[0]) + r2[0];
+  }
+
+  function payload(data) {
+    let value = data[2];
+    return {
+      value: value,
+      raw: data
+    };
+  }
+
+  function anyPayload(control, data) {
+    let value = data[2];
+    return {
+      control: control,
+      value: value,
+      raw: data
+    };
+  } // device connection and port storing
 
 
-function storePortConnections(port, device) {
-  const {
-    name,
-    type,
-    state
-  } = port;
-  if (!name.includes(device.deviceName)) return;
-  const cleanName = (0, _camelcase.default)(name.replace(`${device.deviceName} `, ''));
-  device.connections[cleanName][type] = state === 'connected' ? true : false;
-  device[cleanName][type] = port;
-}
+  function storePortConnections(port, device) {
+    const {
+      name,
+      type,
+      state
+    } = port;
+    if (!name.includes(device.deviceName)) return;
+    const cleanName = (0, _camelcase.default)(name.replace(`${device.deviceName} `, ''));
+    device.connections[cleanName][type] = state === 'connected' ? true : false;
+    device[cleanName][type] = port;
+  }
+});
