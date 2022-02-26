@@ -1,4 +1,39 @@
+"use strict";
+
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _eventemitter = _interopRequireDefault(require("eventemitter3"));
+
+var _lodash = require("lodash");
+
+var _midiPorts = _interopRequireDefault(require("midi-ports"));
+
+var _utilities = require("./lib/utilities");
+
+var _deviceData = _interopRequireDefault(require("./lib/device-data"));
+
+var _kmixDefaults = _interopRequireDefault(require("./lib/kmix-defaults"));
+
+var _midiMessageHandler = _interopRequireDefault(require("./lib/midiMessageHandler"));
+
+var _stateChangeHandler = _interopRequireDefault(require("./lib/stateChangeHandler"));
+
+var _controlMessageFromOptions = _interopRequireDefault(require("./lib/control-message-from-options"));
+
+var _controlMessage = _interopRequireWildcard(require("./lib/control-message"));
+
+var _help = _interopRequireDefault(require("./lib/help"));
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -22,18 +57,6 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-import EventEmitter from 'eventemitter3';
-import { merge, initial, partial } from "lodash"; // modules
-
-import createDeviceList from 'midi-ports';
-import { storePortConnections, convertOptions } from './lib/utilities';
-import deviceData from './lib/device-data';
-import kmixDefaults from "./lib/kmix-defaults";
-import midiMessageHandler from "./lib/midiMessageHandler";
-import stateChangeHandler from "./lib/stateChangeHandler";
-import controlMessageFromOptions from './lib/control-message-from-options';
-import { default as controlMessage, getControlType } from "./lib/control-message";
-import help from "./lib/help";
 var options = {},
     ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
     names = ['bank_1', 'bank_2', 'bank_3', 'mode'];
@@ -86,7 +109,7 @@ var KMIX = /*#__PURE__*/function (_EventEmitter) {
     });
 
     _defineProperty(_assertThisInitialized(_this), "help", function () {
-      return partial(help, options);
+      return (0, _lodash.partial)(_help.default, options);
     }());
 
     _this.deviceName = 'K-Mix';
@@ -121,22 +144,22 @@ var KMIX = /*#__PURE__*/function (_EventEmitter) {
     _this.midi = midi; // set statechange handler
 
     _this.midi.addEventListener('statechange', function (e) {
-      return stateChangeHandler(e, _assertThisInitialized(_this));
+      return (0, _stateChangeHandler.default)(e, _assertThisInitialized(_this));
     });
 
-    _this.banks = initial(names);
-    var newOptions = convertOptions(userOptions, names); // make options
+    _this.banks = (0, _lodash.initial)(names);
+    var newOptions = (0, _utilities.convertOptions)(userOptions, names); // make options
 
-    _this.options = merge(kmixDefaults, newOptions); // make devices object
+    _this.options = (0, _lodash.merge)(_kmixDefaults.default, newOptions); // make devices object
 
-    _this.devices = createDeviceList(_this.midi, deviceData); // store ports and connecitons
+    _this.devices = (0, _midiPorts.default)(_this.midi, _deviceData.default); // store ports and connecitons
 
     _this.midi.inputs.forEach(function (input) {
-      return storePortConnections(input, _assertThisInitialized(_this));
+      return (0, _utilities.storePortConnections)(input, _assertThisInitialized(_this));
     });
 
     _this.midi.outputs.forEach(function (output) {
-      return storePortConnections(output, _assertThisInitialized(_this));
+      return (0, _utilities.storePortConnections)(output, _assertThisInitialized(_this));
     });
 
     if (!_this.controlSurface.input) return _possibleConstructorReturn(_this); // set main ports
@@ -149,13 +172,13 @@ var KMIX = /*#__PURE__*/function (_EventEmitter) {
 
       _this.inputDebug.onmidimessage = function (e) {
         // add formatted console logging
-        midiMessageHandler(e, _assertThisInitialized(_this));
+        (0, _midiMessageHandler.default)(e, _assertThisInitialized(_this));
       };
     } else {
       // set event handler
       _this.input.onmidimessage = function (e) {
         // add formatted console logging
-        midiMessageHandler(e, _assertThisInitialized(_this));
+        (0, _midiMessageHandler.default)(e, _assertThisInitialized(_this));
       };
     }
 
@@ -169,7 +192,7 @@ var KMIX = /*#__PURE__*/function (_EventEmitter) {
       var time = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
       var message,
           sendTime,
-          controlType = getControlType(control);
+          controlType = (0, _controlMessage.getControlType)(control);
       sendTime = time;
 
       switch (controlType) {
@@ -190,7 +213,7 @@ var KMIX = /*#__PURE__*/function (_EventEmitter) {
           // to control-surface : send('control:button-vu',0), send('control:fader-1', 64)
           port = ports[1];
           control = control.split(':')[1];
-          message = controlMessageFromOptions(control, value, bank, options);
+          message = (0, _controlMessageFromOptions.default)(control, value, bank, options);
           break;
 
         case 'raw-expander':
@@ -206,7 +229,7 @@ var KMIX = /*#__PURE__*/function (_EventEmitter) {
         default:
           // 'input', 'main', 'misc', 'preset'
           // to audio control : send('fader:1', value, time)
-          message = controlMessage(control, value, controlType);
+          message = (0, _controlMessage.default)(control, value, controlType);
           break;
       }
 
@@ -219,6 +242,6 @@ var KMIX = /*#__PURE__*/function (_EventEmitter) {
   }]);
 
   return KMIX;
-}(EventEmitter);
+}(_eventemitter.default);
 
-export { KMIX as default };
+exports.default = KMIX;

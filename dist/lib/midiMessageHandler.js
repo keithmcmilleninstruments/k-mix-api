@@ -1,27 +1,38 @@
-import { omit } from "lodash";
-import { findControl, findBank } from "./control-message";
-import { payload, anyPayload } from "./utilities"; // debug
+"use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = midiMessageHandler;
+
+var _lodash = require("lodash");
+
+var _controlMessage = require("./control-message");
+
+var _utilities = require("./utilities");
+
+// debug
 var kmixLog = document.querySelector('#kmixlog');
-export default function midiMessageHandler(event, device) {
+
+function midiMessageHandler(event, device) {
   var data = event.data,
       type = data[0] & 0xf0,
       channel = data[0] & 0xf,
       control = data[1],
-      bank = findBank(device.banks, channel, device.options),
+      bank = (0, _controlMessage.findBank)(device.banks, channel, device.options),
       port = '',
       controlName = '',
       kind = '';
   port = event.target.name; // find control; 'fader-1'
 
-  controlName = findControl(control, type, bank, device.options); // emit ':off' if 128
+  controlName = (0, _controlMessage.findControl)(control, type, bank, device.options); // emit ':off' if 128
 
   if (type === 128) kind = ':off'; // send out event for controlName
 
-  device.emit(controlName + kind, payload(data)); // if listening for any event
+  device.emit(controlName + kind, (0, _utilities.payload)(data)); // if listening for any event
 
   if (device.listeners('any', true)) {
-    device.emit('any', anyPayload(controlName + kind, data));
+    device.emit('any', (0, _utilities.anyPayload)(controlName + kind, data));
   } // debug to console
 
 
@@ -35,7 +46,7 @@ export default function midiMessageHandler(event, device) {
     };
 
     if (port === 'K-Mix Audio Control') {
-      debugLog = omit(debugLog, 'control:');
+      debugLog = (0, _lodash.omit)(debugLog, 'control:');
       debugLog['channel:'] = data[7] + 1;
     }
 

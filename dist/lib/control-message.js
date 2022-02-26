@@ -1,22 +1,37 @@
-// vendor
-import { without, findKey, indexOf } from 'lodash'; // modules
+"use strict";
 
-import { isEqual } from './utilities';
-import { input_channel_params, main_output_bus_params, misc_params } from './kmix-control-messages';
-var messages = [input_channel_params, main_output_bus_params, misc_params];
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = controlMessage;
+exports.findBank = findBank;
+exports.findControl = findControl;
+exports.getControlType = getControlType;
+exports.messages = void 0;
+
+var _lodash = require("lodash");
+
+var _utilities = require("./utilities");
+
+var _kmixControlMessages = require("./kmix-control-messages");
+
+// vendor
+// modules
+var messages = [_kmixControlMessages.input_channel_params, _kmixControlMessages.main_output_bus_params, _kmixControlMessages.misc_params];
+exports.messages = messages;
 
 function findControl(value, eventType, bank, options) {
-  return findKey(options, function (o) {
-    return findIndex(eventType, o.type) != -1 && isEqual(o[bank], value);
+  return (0, _lodash.findKey)(options, function (o) {
+    return findIndex(eventType, o.type) != -1 && (0, _utilities.isEqual)(o[bank], value);
   });
 }
 
 function findIndex(value, array) {
-  return indexOf(array, value);
+  return (0, _lodash.indexOf)(array, value);
 }
 
 function findBank(banks, channel, options) {
-  return banks[indexOf(options['midi-channels'], channel + 1)];
+  return banks[(0, _lodash.indexOf)(options['midi-channels'], channel + 1)];
 }
 
 function getControlType(control) {
@@ -82,7 +97,5 @@ function controlMessage(control, value) {
   var channel = messageType === 'input' ? inputChannel : channelTypes[messageTypes.indexOf(messageType)];
   type = type + channel - 1;
   var message = [type, cc, value];
-  return without(message, undefined, null);
+  return (0, _lodash.without)(message, undefined, null);
 }
-
-export { controlMessage as default, findControl, getControlType, findBank, messages };

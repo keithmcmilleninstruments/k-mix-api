@@ -1,4 +1,10 @@
-export default {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = {
   "midi-channels": [1, 2, 3],
   "fader-1": {
     "bank_1": 1,
@@ -282,3 +288,4 @@ export default {
     "type": [144, 128]
   }
 };
+exports.default = _default;

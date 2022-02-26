@@ -1,6 +1,14 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = controlMessageFromOptions;
+
+var _lodash = require("lodash");
+
 // vendor
-import { without } from 'lodash';
-export default function controlMessageFromOptions(control, value, bank, options) {
+function controlMessageFromOptions(control, value, bank, options) {
   var banks = ['bank_1', 'bank_2', 'bank_3'],
       channel = options['midi-channels'][bank - 1],
       cc = options[control][banks[bank - 1]],
@@ -20,5 +28,5 @@ export default function controlMessageFromOptions(control, value, bank, options)
   type = type + channel - 1;
   if (!type) throw new Error('Check control name');
   var message = [type, cc, value];
-  return without(message, undefined, null);
+  return (0, _lodash.without)(message, undefined, null);
 }
