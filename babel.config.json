@@ -1,4 +1,7 @@
 {
+  "assumptions": {
+    "superIsCallableConstructor": true
+  },
   "presets": [
     [
       "@babel/preset-env",
