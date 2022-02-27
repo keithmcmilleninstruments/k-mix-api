@@ -1,23 +1,19 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
+    define([], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports);
+    factory();
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports);
+    factory();
     global.kmixDefaults = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.default = void 0;
-  var _default = {
+  var KMIXDefaults = {
     "midi-channels": [1, 2, 3],
     "fader-1": {
       "bank_1": 1,
@@ -301,5 +297,5 @@
       "type": [144, 128]
     }
   };
-  _exports.default = _default;
+  module.exports = KMIXDefaults;
 });

@@ -1,30 +1,21 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "lodash", "./utilities", "./kmix-control-messages"], factory);
+    define(["lodash", "./utilities", "./kmix-control-messages"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("lodash"), require("./utilities"), require("./kmix-control-messages"));
+    factory(require("lodash"), require("./utilities"), require("./kmix-control-messages"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.lodash, global.utilities, global.kmixControlMessages);
+    factory(global.lodash, global.utilities, global.kmixControlMessages);
     global.controlMessage = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _lodash, _utilities, _kmixControlMessages) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_lodash, _utilities, _kmixControlMessages) {
   "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.controlMessage = controlMessage;
-  _exports.findBank = findBank;
-  _exports.findControl = findControl;
-  _exports.getControlType = getControlType;
-  _exports.messages = void 0;
   // vendor
   // modules
   var messages = [_kmixControlMessages.input_channel_params, _kmixControlMessages.main_output_bus_params, _kmixControlMessages.misc_params];
-  _exports.messages = messages;
 
   function findControl(value, eventType, bank, options) {
     return (0, _lodash.findKey)(options, function (o) {
@@ -105,4 +96,10 @@
     var message = [type, cc, value];
     return (0, _lodash.without)(message, undefined, null);
   }
+
+  exports.controlMessage = controlMessage;
+  exports.findControl = findControl;
+  exports.getControlType = getControlType;
+  exports.findBank = findBank;
+  exports.messages = messages;
 });

@@ -1,22 +1,18 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "camelcase"], factory);
+    define(["camelcase"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("camelcase"));
+    factory(require("camelcase"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.camelcase);
+    factory(global.camelcase);
     global.stateChangeHandler = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _camelcase) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_camelcase) {
   "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.default = stateChangeHandler;
   _camelcase = _interopRequireDefault(_camelcase);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -63,4 +59,6 @@
       device.emit('disconnected');
     }
   }
+
+  module.exports = stateChangeHandler;
 });

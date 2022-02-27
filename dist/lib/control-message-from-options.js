@@ -1,22 +1,17 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "lodash"], factory);
+    define(["lodash"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("lodash"));
+    factory(require("lodash"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.lodash);
+    factory(global.lodash);
     global.controlMessageFromOptions = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _lodash) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_lodash) {
   "use strict";
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.controlMessageFromOptions = controlMessageFromOptions;
 
   // vendor
   function controlMessageFromOptions(control, value, bank, options) {
@@ -41,4 +36,6 @@
     var message = [type, cc, value];
     return (0, _lodash.without)(message, undefined, null);
   }
+
+  module.exports = controlMessageFromOptions;
 });

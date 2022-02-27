@@ -6,7 +6,7 @@ import { payload, anyPayload } from "./utilities"
 // debug
 let kmixLog = document.querySelector('#kmixlog');
 
-export default function midiMessageHandler(event, device){
+function midiMessageHandler(event, device){
 	let data = event.data,
 			type = data[0] & 0xf0,
 			channel = data[0] & 0xf,
@@ -48,3 +48,5 @@ export default function midiMessageHandler(event, device){
 	}
 	if(kmixLog) kmixLog.innerHTML = controlName + '<br>from ' + port + '<br>portID ' + e.target.id + '<br>' + data + '<br>channel ' + (channel + 1);
 }
+
+module.exports = midiMessageHandler

@@ -185,4 +185,6 @@ let misc_params = {
 // CHANGING PRESETS WITH PROGRAM CHANGE MESSAGES sent to any channel on  K-Mix Audio Control port
 // Program Change : 0xCx; [C0,1] set preset 1
 
-export { input_channel_params, main_output_bus_params, misc_params };
+exports.input_channel_params = input_channel_params
+exports.main_output_bus_params = main_output_bus_params
+exports.misc_params = misc_params

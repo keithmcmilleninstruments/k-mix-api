@@ -4,10 +4,10 @@ import { merge, initial, partial } from "lodash"
 // modules
 import createDeviceList from 'midi-ports';
 import { storePortConnections, convertOptions } from './lib/utilities'
-import {default as deviceData} from './lib/device-data';
-import {default as kmixDefaults} from "./lib/kmix-defaults";
-import {default as midiMessageHandler} from "./lib/midiMessageHandler";
-import {default as stateChangeHandler} from "./lib/stateChangeHandler";
+import deviceData from './lib/device-data';
+import kmixDefaults from "./lib/kmix-defaults";
+import midiMessageHandler from "./lib/midiMessageHandler";
+import stateChangeHandler from "./lib/stateChangeHandler";
 import { controlMessageFromOptions } from './lib/control-message-from-options';
 import { controlMessage, getControlType } from "./lib/control-message";
 import { help } from "./lib/help";
@@ -16,7 +16,7 @@ let options = {},
 	ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
 	names = ['bank_1', 'bank_2', 'bank_3', 'mode']
 
-export class KMIX {
+class KMIX {
 	constructor(midi, userOptions = {}, debug = false){
 		// event emitter		
 		this.ee = mitt()
@@ -163,3 +163,5 @@ export class KMIX {
 
 	help = (() => partial(help, options))()
 }
+
+module.exports = KMIX

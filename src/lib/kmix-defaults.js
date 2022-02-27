@@ -1,4 +1,4 @@
-export default {
+const KMIXDefaults = {
 	"midi-channels": [1,2,3],
 	"fader-1": {"bank_1": 1, "bank_2": 1, "bank_3": 1, "type": [176]},
 	"fader-2": {"bank_1": 2, "bank_2": 2, "bank_3": 2, "type": [176]},
@@ -44,3 +44,5 @@ export default {
 	"transport-left": {"bank_1": 28, "bank_2": 28, "bank_3": 28, "mode": "momentary", "type": [144, 128]},
 	"transport-right": {"bank_1": 29, "bank_2": 29, "bank_3": 29, "mode": "momentary", "type": [144, 128]}
 };
+
+module.exports = KMIXDefaults

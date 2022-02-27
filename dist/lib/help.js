@@ -1,23 +1,17 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "lodash", "./control-message"], factory);
+    define(["lodash", "./control-message"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("lodash"), require("./control-message"));
+    factory(require("lodash"), require("./control-message"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.lodash, global.controlMessage);
+    factory(global.lodash, global.controlMessage);
     global.help = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _lodash, _controlMessage) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_lodash, _controlMessage) {
   "use strict";
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.help = help;
-  _exports.helpObject = helpObject;
 
   function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -54,4 +48,7 @@
         break;
     }
   }
+
+  exports.help = help;
+  exports.helpObject = helpObject;
 });

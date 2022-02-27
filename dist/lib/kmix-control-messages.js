@@ -1,22 +1,18 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
+    define([], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports);
+    factory();
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports);
+    factory();
     global.kmixControlMessages = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.misc_params = _exports.main_output_bus_params = _exports.input_channel_params = void 0;
   // convert each to Map
 
   /*
@@ -120,7 +116,6 @@
   • Compressor Makeup Gain = CC 21
   */
 
-  _exports.input_channel_params = input_channel_params;
   var main_output_bus_params = {
     "fader": 1,
     "mute": 2,
@@ -169,7 +164,6 @@
   • Aux 3 Mute = CC 28
   */
 
-  _exports.main_output_bus_params = main_output_bus_params;
   var misc_params = {
     "reverb-send-1": 1,
     "reverb-send-2": 2,
@@ -202,5 +196,7 @@
   }; // CHANGING PRESETS WITH PROGRAM CHANGE MESSAGES sent to any channel on  K-Mix Audio Control port
   // Program Change : 0xCx; [C0,1] set preset 1
 
-  _exports.misc_params = misc_params;
+  exports.input_channel_params = input_channel_params;
+  exports.main_output_bus_params = main_output_bus_params;
+  exports.misc_params = misc_params;
 });

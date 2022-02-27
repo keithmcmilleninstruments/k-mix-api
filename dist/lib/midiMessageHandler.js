@@ -1,22 +1,18 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "lodash", "./control-message", "./utilities"], factory);
+    define(["lodash", "./control-message", "./utilities"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("lodash"), require("./control-message"), require("./utilities"));
+    factory(require("lodash"), require("./control-message"), require("./utilities"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.lodash, global.controlMessage, global.utilities);
+    factory(global.lodash, global.controlMessage, global.utilities);
     global.midiMessageHandler = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _lodash, _controlMessage, _utilities) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_lodash, _controlMessage, _utilities) {
   "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.default = midiMessageHandler;
   // debug
   var kmixLog = document.querySelector('#kmixlog');
 
@@ -61,4 +57,6 @@
 
     if (kmixLog) kmixLog.innerHTML = controlName + '<br>from ' + port + '<br>portID ' + e.target.id + '<br>' + data + '<br>channel ' + (channel + 1);
   }
+
+  module.exports = midiMessageHandler;
 });

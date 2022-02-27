@@ -8,7 +8,7 @@
 }
 */
 
-export default {
+const deviceData = {
 	'k-mix': {
 		'k-mix-audio-control': {
 			'name': 'K-Mix Audio Control'
@@ -23,3 +23,5 @@ export default {
 		'manufacturer': 'keith-mcmillen-instruments'
 	}
 }
+
+module.exports = deviceData

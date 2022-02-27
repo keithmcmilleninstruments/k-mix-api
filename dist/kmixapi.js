@@ -1,22 +1,18 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "mitt", "lodash", "midi-ports", "./lib/utilities", "./lib/device-data", "./lib/kmix-defaults", "./lib/midiMessageHandler", "./lib/stateChangeHandler", "./lib/control-message-from-options", "./lib/control-message", "./lib/help"], factory);
+    define(["mitt", "lodash", "midi-ports", "./lib/utilities", "./lib/device-data", "./lib/kmix-defaults", "./lib/midiMessageHandler", "./lib/stateChangeHandler", "./lib/control-message-from-options", "./lib/control-message", "./lib/help"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("mitt"), require("lodash"), require("midi-ports"), require("./lib/utilities"), require("./lib/device-data"), require("./lib/kmix-defaults"), require("./lib/midiMessageHandler"), require("./lib/stateChangeHandler"), require("./lib/control-message-from-options"), require("./lib/control-message"), require("./lib/help"));
+    factory(require("mitt"), require("lodash"), require("midi-ports"), require("./lib/utilities"), require("./lib/device-data"), require("./lib/kmix-defaults"), require("./lib/midiMessageHandler"), require("./lib/stateChangeHandler"), require("./lib/control-message-from-options"), require("./lib/control-message"), require("./lib/help"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.mitt, global.lodash, global.midiPorts, global.utilities, global.deviceData, global.kmixDefaults, global.midiMessageHandler, global.stateChangeHandler, global.controlMessageFromOptions, global.controlMessage, global.help);
+    factory(global.mitt, global.lodash, global.midiPorts, global.utilities, global.deviceData, global.kmixDefaults, global.midiMessageHandler, global.stateChangeHandler, global.controlMessageFromOptions, global.controlMessage, global.help);
     global.kmixapi = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _mitt, _lodash, _midiPorts, _utilities, _deviceData, _kmixDefaults, _midiMessageHandler, _stateChangeHandler, _controlMessageFromOptions, _controlMessage, _help) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_mitt, _lodash, _midiPorts, _utilities, _deviceData, _kmixDefaults, _midiMessageHandler, _stateChangeHandler, _controlMessageFromOptions, _controlMessage, _help) {
   "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.KMIX = void 0;
   _mitt = _interopRequireDefault(_mitt);
   _midiPorts = _interopRequireDefault(_midiPorts);
   _deviceData = _interopRequireDefault(_deviceData);
@@ -227,5 +223,5 @@
     return KMIX;
   }();
 
-  _exports.KMIX = KMIX;
+  module.exports = KMIX;
 });

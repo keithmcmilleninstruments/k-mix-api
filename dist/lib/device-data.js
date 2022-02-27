@@ -1,22 +1,17 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports"], factory);
+    define([], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports);
+    factory();
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports);
+    factory();
     global.deviceData = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function () {
   "use strict";
-
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.default = void 0;
 
   /*
   'device' : {
@@ -27,7 +22,7 @@
   	'manufacturer': 'Keith McMillen Instruments'
   }
   */
-  var _default = {
+  var deviceData = {
     'k-mix': {
       'k-mix-audio-control': {
         'name': 'K-Mix Audio Control'
@@ -42,5 +37,5 @@
       'manufacturer': 'keith-mcmillen-instruments'
     }
   };
-  _exports.default = _default;
+  module.exports = deviceData;
 });

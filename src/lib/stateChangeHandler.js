@@ -1,6 +1,6 @@
 import camelcase from 'camelcase'
 
-export default function stateChangeHandler(event, device) {
+function stateChangeHandler(event, device) {
   const { name, type, state } = event.port
   let portName = 'error'
 
@@ -39,3 +39,5 @@ export default function stateChangeHandler(event, device) {
   }
 
 }
+
+module.exports = stateChangeHandler

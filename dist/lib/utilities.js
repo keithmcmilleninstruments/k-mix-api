@@ -1,29 +1,18 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "camelcase", "lodash"], factory);
+    define(["camelcase", "lodash"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("camelcase"), require("lodash"));
+    factory(require("camelcase"), require("lodash"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.camelcase, global.lodash);
+    factory(global.camelcase, global.lodash);
     global.utilities = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _camelcase, _lodash) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_camelcase, _lodash) {
   "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
-    value: true
-  });
-  _exports.anyPayload = anyPayload;
-  _exports.arraysToObject = arraysToObject;
-  _exports.convertOptions = convertOptions;
-  _exports.convertRange = convertRange;
-  _exports.format = format;
-  _exports.isEqual = isEqual;
-  _exports.payload = payload;
-  _exports.storePortConnections = storePortConnections;
   _camelcase = _interopRequireDefault(_camelcase);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -85,4 +74,13 @@
     device.connections[cleanName][type] = state === 'connected' ? true : false;
     device[cleanName][type] = port;
   }
+
+  exports.isEqual = isEqual;
+  exports.format = format;
+  exports.convertOptions = convertOptions;
+  exports.arraysToObject = arraysToObject;
+  exports.convertRange = convertRange;
+  exports.payload = payload;
+  exports.anyPayload = anyPayload;
+  exports.storePortConnections = storePortConnections;
 });
