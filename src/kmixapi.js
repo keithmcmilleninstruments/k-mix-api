@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import mitt from 'mitt';
 import { merge, initial, partial } from "lodash"
 
 // modules
@@ -16,9 +16,10 @@ let options = {},
 	ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
 	names = ['bank_1', 'bank_2', 'bank_3', 'mode']
 
-export default class KMIX extends EventEmitter {
+export default class KMIX {
 	constructor(midi, userOptions = {}, debug = false){
-		super()
+		// event emitter		
+		this.ee = mitt()
 
 		this.deviceName = 'K-Mix'
 		this._debug = debug
@@ -68,6 +69,18 @@ export default class KMIX extends EventEmitter {
 				midiMessageHandler(e, this)
 			}
 		}
+	}
+
+	emit(name, payload) {
+		this.ee.emit(name, payload)
+	}
+
+	on(name, cb) {
+		this.ee.on(name, cb)
+	}
+
+	off(name) {
+		this.ee.off(name, cb)
 	}
 
 	send(control, value, bank = 1, time = 0) {

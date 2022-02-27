@@ -2,24 +2,24 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["exports", "eventemitter3", "lodash", "midi-ports", "./lib/utilities", "./lib/device-data", "./lib/kmix-defaults", "./lib/midiMessageHandler", "./lib/stateChangeHandler", "./lib/control-message-from-options", "./lib/control-message", "./lib/help"], factory);
+    define(["exports", "mitt", "lodash", "midi-ports", "./lib/utilities", "./lib/device-data", "./lib/kmix-defaults", "./lib/midiMessageHandler", "./lib/stateChangeHandler", "./lib/control-message-from-options", "./lib/control-message", "./lib/help"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require("eventemitter3"), require("lodash"), require("midi-ports"), require("./lib/utilities"), require("./lib/device-data"), require("./lib/kmix-defaults"), require("./lib/midiMessageHandler"), require("./lib/stateChangeHandler"), require("./lib/control-message-from-options"), require("./lib/control-message"), require("./lib/help"));
+    factory(exports, require("mitt"), require("lodash"), require("midi-ports"), require("./lib/utilities"), require("./lib/device-data"), require("./lib/kmix-defaults"), require("./lib/midiMessageHandler"), require("./lib/stateChangeHandler"), require("./lib/control-message-from-options"), require("./lib/control-message"), require("./lib/help"));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.eventemitter3, global.lodash, global.midiPorts, global.utilities, global.deviceData, global.kmixDefaults, global.midiMessageHandler, global.stateChangeHandler, global.controlMessageFromOptions, global.controlMessage, global.help);
+    factory(mod.exports, global.mitt, global.lodash, global.midiPorts, global.utilities, global.deviceData, global.kmixDefaults, global.midiMessageHandler, global.stateChangeHandler, global.controlMessageFromOptions, global.controlMessage, global.help);
     global.kmixapi = mod.exports;
   }
-})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _eventemitter, _lodash, _midiPorts, _utilities, _deviceData, _kmixDefaults, _midiMessageHandler, _stateChangeHandler, _controlMessageFromOptions, _controlMessage, _help) {
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _mitt, _lodash, _midiPorts, _utilities, _deviceData, _kmixDefaults, _midiMessageHandler, _stateChangeHandler, _controlMessageFromOptions, _controlMessage, _help) {
   "use strict";
 
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
   _exports.default = void 0;
-  _eventemitter = _interopRequireDefault(_eventemitter);
+  _mitt = _interopRequireDefault(_mitt);
   _midiPorts = _interopRequireDefault(_midiPorts);
   _deviceData = _interopRequireDefault(_deviceData);
   _kmixDefaults = _interopRequireDefault(_kmixDefaults);
@@ -41,34 +41,22 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 
   function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
-  function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
-
-  function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-  function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-  function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
   function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
   var options = {},
       ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
       names = ['bank_1', 'bank_2', 'bank_3', 'mode'];
 
-  var KMIX = /*#__PURE__*/function (_EventEmitter) {
-    _inherits(KMIX, _EventEmitter);
-
+  var KMIX = /*#__PURE__*/function () {
     function KMIX(midi) {
-      var _this;
+      var _this = this;
 
       var userOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var debug = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
       _classCallCheck(this, KMIX);
 
-      _this = _EventEmitter.call(this) || this;
-
-      _defineProperty(_assertThisInitialized(_this), "isConnected", function () {
+      _defineProperty(this, "isConnected", function () {
         var port = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'all';
 
         switch (port) {
@@ -100,14 +88,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
         }
       });
 
-      _defineProperty(_assertThisInitialized(_this), "help", function () {
+      _defineProperty(this, "help", function () {
         return (0, _lodash.partial)(_help.default, options);
       }());
 
-      _this.deviceName = 'K-Mix';
-      _this._debug = debug; // store port connection status
+      // event emitter		
+      this.ee = (0, _mitt.default)();
+      this.deviceName = 'K-Mix';
+      this._debug = debug; // store port connection status
 
-      _this.connections = {
+      this.connections = {
         audioControl: {
           input: false,
           output: false
@@ -121,63 +111,73 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           output: false
         }
       };
-      _this.audioControl = {
+      this.audioControl = {
         input: null,
         output: null
       };
-      _this.controlSurface = {
+      this.controlSurface = {
         input: null,
         output: null
       };
-      _this.expander = {
+      this.expander = {
         input: null,
         output: null
       };
-      _this.midi = midi; // set statechange handler
+      this.midi = midi; // set statechange handler
 
-      _this.midi.addEventListener('statechange', function (e) {
-        return (0, _stateChangeHandler.default)(e, _assertThisInitialized(_this));
+      this.midi.addEventListener('statechange', function (e) {
+        return (0, _stateChangeHandler.default)(e, _this);
       });
-
-      _this.banks = (0, _lodash.initial)(names);
+      this.banks = (0, _lodash.initial)(names);
       var newOptions = (0, _utilities.convertOptions)(userOptions, names); // make options
 
-      _this.options = (0, _lodash.merge)(_kmixDefaults.default, newOptions); // make devices object
+      this.options = (0, _lodash.merge)(_kmixDefaults.default, newOptions); // make devices object
 
-      _this.devices = (0, _midiPorts.default)(_this.midi, _deviceData.default); // store ports and connecitons
+      this.devices = (0, _midiPorts.default)(this.midi, _deviceData.default); // store ports and connecitons
 
-      _this.midi.inputs.forEach(function (input) {
-        return (0, _utilities.storePortConnections)(input, _assertThisInitialized(_this));
+      this.midi.inputs.forEach(function (input) {
+        return (0, _utilities.storePortConnections)(input, _this);
       });
-
-      _this.midi.outputs.forEach(function (output) {
-        return (0, _utilities.storePortConnections)(output, _assertThisInitialized(_this));
+      this.midi.outputs.forEach(function (output) {
+        return (0, _utilities.storePortConnections)(output, _this);
       });
+      if (!this.controlSurface.input) return; // set main ports
 
-      if (!_this.controlSurface.input) return _possibleConstructorReturn(_this); // set main ports
+      this.input = this.controlSurface.input;
+      this.output = this.audioControl.output; // debug
 
-      _this.input = _this.controlSurface.input;
-      _this.output = _this.audioControl.output; // debug
+      if (this._debug) {
+        this.inputDebug = this.audioControl.input;
 
-      if (_this._debug) {
-        _this.inputDebug = _this.audioControl.input;
-
-        _this.inputDebug.onmidimessage = function (e) {
+        this.inputDebug.onmidimessage = function (e) {
           // add formatted console logging
-          (0, _midiMessageHandler.default)(e, _assertThisInitialized(_this));
+          (0, _midiMessageHandler.default)(e, _this);
         };
       } else {
         // set event handler
-        _this.input.onmidimessage = function (e) {
+        this.input.onmidimessage = function (e) {
           // add formatted console logging
-          (0, _midiMessageHandler.default)(e, _assertThisInitialized(_this));
+          (0, _midiMessageHandler.default)(e, _this);
         };
       }
-
-      return _this;
     }
 
     _createClass(KMIX, [{
+      key: "emit",
+      value: function emit(name, payload) {
+        this.ee.emit(name, payload);
+      }
+    }, {
+      key: "on",
+      value: function on(name, cb) {
+        this.ee.on(name, cb);
+      }
+    }, {
+      key: "off",
+      value: function off(name) {
+        this.ee.off(name, cb);
+      }
+    }, {
       key: "send",
       value: function send(control, value) {
         var bank = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
@@ -234,7 +234,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
     }]);
 
     return KMIX;
-  }(_eventemitter.default);
+  }();
 
   _exports.default = KMIX;
 });

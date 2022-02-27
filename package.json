@@ -1,6 +1,6 @@
 {
   "name": "k-mix-api",
-  "version": "1.4.10",
+  "version": "1.4.12",
   "description": "Javascript API for full control of Keith McMillen Instruments K-Mix",
   "keywords": [
     "k-mix",
@@ -32,9 +32,9 @@
   "license": "ISC",
   "browserslist": "> 0.25%, not dead, not IE 11",
   "dependencies": {
-    "eventemitter3": "^4.0.7",
     "lodash": "^4.17.15",
-    "midi-ports": "^1.0.3"
+    "midi-ports": "^1.0.3",
+    "mitt": "^3.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
