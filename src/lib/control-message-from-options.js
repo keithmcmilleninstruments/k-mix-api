@@ -1,7 +1,7 @@
 // vendor
 import { without } from 'lodash'
 
-export default function controlMessageFromOptions(control, value, bank, options){
+export function controlMessageFromOptions(control, value, bank, options){
 	let banks = ['bank_1', 'bank_2', 'bank_3'],
 			channel = options['midi-channels'][bank - 1],
 			cc = options[control][banks[bank - 1]],

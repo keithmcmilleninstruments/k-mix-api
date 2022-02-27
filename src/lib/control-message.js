@@ -79,4 +79,4 @@ function controlMessage(control, value, messageType = 'input'){
 	return without(message, undefined, null);
 }
 
-export { controlMessage as default, findControl, getControlType, findBank, messages };
+export { controlMessage, findControl, getControlType, findBank, messages };

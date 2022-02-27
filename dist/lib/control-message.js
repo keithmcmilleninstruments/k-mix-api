@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.default = controlMessage;
+  _exports.controlMessage = controlMessage;
   _exports.findBank = findBank;
   _exports.findControl = findControl;
   _exports.getControlType = getControlType;

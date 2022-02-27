@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.default = controlMessageFromOptions;
+  _exports.controlMessageFromOptions = controlMessageFromOptions;
 
   // vendor
   function controlMessageFromOptions(control, value, bank, options) {

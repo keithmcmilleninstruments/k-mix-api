@@ -1,7 +1,4 @@
 {
-  "assumptions": {
-    "superIsCallableConstructor": true
-  },
   "presets": [
     [
       "@babel/preset-env",
@@ -10,5 +7,6 @@
         "modules": "umd"
       }
     ]
-  ]
+  ],
+  "plugins": ["add-module-exports"]
 }

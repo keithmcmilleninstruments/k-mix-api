@@ -63,4 +63,6 @@
       device.emit('disconnected');
     }
   }
+
+  module.exports = exports.default;
 });

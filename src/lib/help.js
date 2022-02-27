@@ -30,4 +30,4 @@ function help(options, request){
 	}
 }
 
-export { help as default, helpObject }
+export { help, helpObject }

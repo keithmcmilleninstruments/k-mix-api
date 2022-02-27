@@ -1,5 +1,3 @@
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
     define(["exports", "mitt", "lodash", "midi-ports", "./lib/utilities", "./lib/device-data", "./lib/kmix-defaults", "./lib/midiMessageHandler", "./lib/stateChangeHandler", "./lib/control-message-from-options", "./lib/control-message", "./lib/help"], factory);
@@ -18,20 +16,13 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.default = void 0;
+  _exports.KMIX = void 0;
   _mitt = _interopRequireDefault(_mitt);
   _midiPorts = _interopRequireDefault(_midiPorts);
   _deviceData = _interopRequireDefault(_deviceData);
   _kmixDefaults = _interopRequireDefault(_kmixDefaults);
   _midiMessageHandler = _interopRequireDefault(_midiMessageHandler);
   _stateChangeHandler = _interopRequireDefault(_stateChangeHandler);
-  _controlMessageFromOptions = _interopRequireDefault(_controlMessageFromOptions);
-  _controlMessage = _interopRequireWildcard(_controlMessage);
-  _help = _interopRequireDefault(_help);
-
-  function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-  function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -89,7 +80,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
       });
 
       _defineProperty(this, "help", function () {
-        return (0, _lodash.partial)(_help.default, options);
+        return (0, _lodash.partial)(_help.help, options);
       }());
 
       // event emitter		
@@ -205,7 +196,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
             // to control-surface : send('control:button-vu',0), send('control:fader-1', 64)
             port = ports[1];
             control = control.split(':')[1];
-            message = (0, _controlMessageFromOptions.default)(control, value, bank, options);
+            message = (0, _controlMessageFromOptions.controlMessageFromOptions)(control, value, bank, options);
             break;
 
           case 'raw-expander':
@@ -221,7 +212,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
           default:
             // 'input', 'main', 'misc', 'preset'
             // to audio control : send('fader:1', value, time)
-            message = (0, _controlMessage.default)(control, value, controlType);
+            message = (0, _controlMessage.controlMessage)(control, value, controlType);
             break;
         }
 
@@ -236,5 +227,5 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
     return KMIX;
   }();
 
-  _exports.default = KMIX;
+  _exports.KMIX = KMIX;
 });
