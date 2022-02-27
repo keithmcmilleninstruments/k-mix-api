@@ -242,7 +242,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
     }]);
 
     return KMIX;
-  }(_eventemitter.default);
+  }(_eventemitter);
 
   _exports.default = KMIX;
 });

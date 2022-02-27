@@ -13,8 +13,8 @@ import { default as controlMessage, getControlType } from "./lib/control-message
 import help from "./lib/help";
 
 let options = {},
-		ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
-		names = ['bank_1', 'bank_2', 'bank_3', 'mode']
+	ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
+	names = ['bank_1', 'bank_2', 'bank_3', 'mode']
 
 export default class KMIX extends EventEmitter {
 	constructor(midi, userOptions = {}, debug = false){
