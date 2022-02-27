@@ -1,5 +1,3 @@
-"use strict";
-
 var KMIXDefaults = {
   "midi-channels": [1, 2, 3],
   "fader-1": {

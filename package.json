@@ -1,6 +1,6 @@
 {
   "name": "k-mix-api",
-  "version": "1.4.17",
+  "version": "1.4.18",
   "description": "Javascript API for full control of Keith McMillen Instruments K-Mix",
   "keywords": [
     "k-mix",

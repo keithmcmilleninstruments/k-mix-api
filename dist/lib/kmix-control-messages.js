@@ -1,5 +1,3 @@
-"use strict";
-
 // convert each to Map
 
 /*

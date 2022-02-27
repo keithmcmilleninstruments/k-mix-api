@@ -1,29 +1,3 @@
-"use strict";
-
-var _mitt = _interopRequireDefault(require("mitt"));
-
-var _lodash = require("lodash");
-
-var _midiPorts = _interopRequireDefault(require("midi-ports"));
-
-var _utilities = require("./lib/utilities");
-
-var _deviceData = _interopRequireDefault(require("./lib/device-data"));
-
-var _kmixDefaults = _interopRequireDefault(require("./lib/kmix-defaults"));
-
-var _midiMessageHandler = _interopRequireDefault(require("./lib/midiMessageHandler"));
-
-var _stateChangeHandler = _interopRequireDefault(require("./lib/stateChangeHandler"));
-
-var _controlMessageFromOptions = require("./lib/control-message-from-options");
-
-var _controlMessage = require("./lib/control-message");
-
-var _help = require("./lib/help");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -32,6 +6,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+import mitt from 'mitt';
+import { merge, initial, partial } from "lodash"; // modules
+
+import createDeviceList from 'midi-ports';
+import { storePortConnections, convertOptions } from './lib/utilities';
+import deviceData from './lib/device-data';
+import kmixDefaults from "./lib/kmix-defaults";
+import midiMessageHandler from "./lib/midiMessageHandler";
+import stateChangeHandler from "./lib/stateChangeHandler";
+import { controlMessageFromOptions } from './lib/control-message-from-options';
+import { controlMessage, getControlType } from "./lib/control-message";
+import { help } from "./lib/help";
 var options = {},
     ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
     names = ['bank_1', 'bank_2', 'bank_3', 'mode'];
@@ -78,11 +64,11 @@ var KMIX = /*#__PURE__*/function () {
     });
 
     _defineProperty(this, "help", function () {
-      return (0, _lodash.partial)(_help.help, options);
+      return partial(help, options);
     }());
 
     // event emitter		
-    this.ee = (0, _mitt.default)();
+    this.ee = mitt();
     this.deviceName = 'K-Mix';
     this._debug = debug; // store port connection status
 
@@ -115,20 +101,20 @@ var KMIX = /*#__PURE__*/function () {
     this.midi = midi; // set statechange handler
 
     this.midi.addEventListener('statechange', function (e) {
-      return (0, _stateChangeHandler.default)(e, _this);
+      return stateChangeHandler(e, _this);
     });
-    this.banks = (0, _lodash.initial)(names);
-    var newOptions = (0, _utilities.convertOptions)(userOptions, names); // make options
+    this.banks = initial(names);
+    var newOptions = convertOptions(userOptions, names); // make options
 
-    this.options = (0, _lodash.merge)(_kmixDefaults.default, newOptions); // make devices object
+    this.options = merge(kmixDefaults, newOptions); // make devices object
 
-    this.devices = (0, _midiPorts.default)(this.midi, _deviceData.default); // store ports and connecitons
+    this.devices = createDeviceList(this.midi, deviceData); // store ports and connecitons
 
     this.midi.inputs.forEach(function (input) {
-      return (0, _utilities.storePortConnections)(input, _this);
+      return storePortConnections(input, _this);
     });
     this.midi.outputs.forEach(function (output) {
-      return (0, _utilities.storePortConnections)(output, _this);
+      return storePortConnections(output, _this);
     });
     if (!this.controlSurface.input) return; // set main ports
 
@@ -140,13 +126,13 @@ var KMIX = /*#__PURE__*/function () {
 
       this.inputDebug.onmidimessage = function (e) {
         // add formatted console logging
-        (0, _midiMessageHandler.default)(e, _this);
+        midiMessageHandler(e, _this);
       };
     } else {
       // set event handler
       this.input.onmidimessage = function (e) {
         // add formatted console logging
-        (0, _midiMessageHandler.default)(e, _this);
+        midiMessageHandler(e, _this);
       };
     }
   }
@@ -173,7 +159,7 @@ var KMIX = /*#__PURE__*/function () {
       var time = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
       var message,
           sendTime,
-          controlType = (0, _controlMessage.getControlType)(control);
+          controlType = getControlType(control);
       sendTime = time;
 
       switch (controlType) {
@@ -194,7 +180,7 @@ var KMIX = /*#__PURE__*/function () {
           // to control-surface : send('control:button-vu',0), send('control:fader-1', 64)
           port = ports[1];
           control = control.split(':')[1];
-          message = (0, _controlMessageFromOptions.controlMessageFromOptions)(control, value, bank, options);
+          message = controlMessageFromOptions(control, value, bank, options);
           break;
 
         case 'raw-expander':
@@ -210,7 +196,7 @@ var KMIX = /*#__PURE__*/function () {
         default:
           // 'input', 'main', 'misc', 'preset'
           // to audio control : send('fader:1', value, time)
-          message = (0, _controlMessage.controlMessage)(control, value, controlType);
+          message = controlMessage(control, value, controlType);
           break;
       }
 

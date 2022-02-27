@@ -1,10 +1,5 @@
-"use strict";
-
-var _camelcase = _interopRequireDefault(require("camelcase"));
-
-var _lodash = require("lodash");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+import camelcase from 'camelcase';
+import { isArray, zipObject } from 'lodash';
 
 function isEqual(a, b) {
   return a === b;
@@ -18,7 +13,7 @@ function convertOptions(user, names) {
   var newOptions = {};
 
   for (var o in user) {
-    if (o === 'midi-channels' || !(0, _lodash.isArray)(user[o])) {
+    if (o === 'midi-channels' || !isArray(user[o])) {
       newOptions[o] = user[o];
     } else {
       newOptions[o] = arraysToObject(user[o], names);
@@ -29,7 +24,7 @@ function convertOptions(user, names) {
 }
 
 function arraysToObject(values, names) {
-  return (0, _lodash.zipObject)(names, values);
+  return zipObject(names, values);
 }
 
 function convertRange(value, r1, r2) {
@@ -59,7 +54,7 @@ function storePortConnections(port, device) {
       type = port.type,
       state = port.state;
   if (!name.includes(device.deviceName)) return;
-  var cleanName = (0, _camelcase.default)(name.replace("".concat(device.deviceName, " "), ''));
+  var cleanName = camelcase(name.replace("".concat(device.deviceName, " "), ''));
   device.connections[cleanName][type] = state === 'connected' ? true : false;
   device[cleanName][type] = port;
 }
