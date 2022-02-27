@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports.KMIX = void 0;
+  _exports.default = void 0;
   _mitt = _interopRequireDefault(_mitt);
   _midiPorts = _interopRequireDefault(_midiPorts);
   _deviceData = _interopRequireDefault(_deviceData);
@@ -227,5 +227,6 @@
     return KMIX;
   }();
 
-  _exports.KMIX = KMIX;
+  _exports.default = KMIX;
+  module.exports = exports.default;
 });
