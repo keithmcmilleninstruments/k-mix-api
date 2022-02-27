@@ -8,5 +8,5 @@
       }
     ]
   ],
-  "plugins": ["add-module-exports"]
+  "plugins": []
 }

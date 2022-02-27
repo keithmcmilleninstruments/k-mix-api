@@ -61,6 +61,4 @@
 
     if (kmixLog) kmixLog.innerHTML = controlName + '<br>from ' + port + '<br>portID ' + e.target.id + '<br>' + data + '<br>channel ' + (channel + 1);
   }
-
-  module.exports = exports.default;
 });
