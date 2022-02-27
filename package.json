@@ -1,6 +1,6 @@
 {
   "name": "k-mix-api",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Javascript API for full control of Keith McMillen Instruments K-Mix",
   "keywords": [
     "k-mix",
@@ -12,23 +12,23 @@
   "repository": "https://github.com/keithmcmilleninstruments/k-mix-api.git",
   "homepage": "https://github.com/keithmcmilleninstruments/k-mix-api/",
   "main": "dist/kmixapi.js",
-  "module": "src/kmixapi.js",
+  "type": "module",
   "scripts": {
     "build": "babel src --out-dir dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Andrej Hronco",
   "license": "ISC",
-  "browserslist": "> 0.25%, not dead",
+  "browserslist": "> 0.25%, not dead, not IE 11",
   "dependencies": {
-    "eventemitter3": "^3.1.2",
+    "eventemitter3": "^4.0.7",
     "lodash": "^4.17.15",
     "midi-ports": "^1.0.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.4.4",
-    "@babel/core": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.5",
+    "@babel/preset-env": "^7.16.11",
     "camelcase": "^5.3.1"
   }
 }

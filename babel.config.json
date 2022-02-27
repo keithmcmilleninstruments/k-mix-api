@@ -3,7 +3,8 @@
     [
       "@babel/preset-env",
       {
-        "modules": "umd"
+        "debug": true,
+        "modules": false
       }
     ]
   ]
