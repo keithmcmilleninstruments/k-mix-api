@@ -27,4 +27,4 @@ function controlMessageFromOptions(control, value, bank, options){
 	return without(message, undefined, null);
 }
 
-module.exports = controlMessageFromOptions
+export { controlMessageFromOptions as default }

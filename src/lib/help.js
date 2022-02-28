@@ -30,5 +30,7 @@ function help(options, request){
 	}
 }
 
-exports.help = help;
-exports.helpObject = helpObject
+export {
+	help,
+	helpObject
+}

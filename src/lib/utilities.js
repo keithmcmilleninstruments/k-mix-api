@@ -1,18 +1,18 @@
 import camelcase from 'camelcase'
-import { isArray, zipObject } from 'lodash';
+import { zipObject } from 'lodash';
 
-function isEqual(a, b){
+export function isEqual(a, b){
 	return a === b;
 }
 
-function format(string){
+export function format(string){
 	return string.toLowerCase().replace(/\s/g, '-').replace(',','')
 }
 
-function convertOptions(user, names){
+export function convertOptions(user, names){
 	let newOptions = {}
 	for(let o in user){
-		if(o === 'midi-channels' || !isArray(user[o])){
+		if(o === 'midi-channels' || !Array.isArray(user[o])){
 			newOptions[o] = user[o]
 		} else {
 			newOptions[o] = arraysToObject(user[o], names)
@@ -21,15 +21,15 @@ function convertOptions(user, names){
 	return newOptions;
 }
 
-function arraysToObject(values, names){
+export function arraysToObject(values, names){
 	return zipObject(names, values)
 }
 
-function convertRange( value, r1, r2 ) {
+export function convertRange( value, r1, r2 ) {
   return ( value - r1[ 0 ] ) * ( r2[ 1 ] - r2[ 0 ] ) / ( r1[ 1 ] - r1[ 0 ] ) + r2[ 0 ];
 }
 
-function payload(data){
+export function payload(data){
 	let value = data[2];
  	return {
 		value: value,
@@ -37,7 +37,7 @@ function payload(data){
 	}
 }
 
-function anyPayload(control, data){
+export function anyPayload(control, data){
 	let value = data[2];
  	return {
  		control: control,
@@ -47,7 +47,7 @@ function anyPayload(control, data){
 }
 
 // device connection and port storing
-function storePortConnections(port, device) {
+export function storePortConnections(port, device) {
 	const {
 		name,
 		type,
@@ -62,12 +62,3 @@ function storePortConnections(port, device) {
 
 	device[cleanName][type] = port
 }
-
-exports.isEqual = isEqual
-exports.format = format
-exports.convertOptions = convertOptions
-exports.arraysToObject = arraysToObject
-exports.convertRange = convertRange
-exports.payload = payload
-exports.anyPayload = anyPayload
-exports.storePortConnections = storePortConnections

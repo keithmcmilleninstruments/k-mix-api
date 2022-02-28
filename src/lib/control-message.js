@@ -79,8 +79,10 @@ function controlMessage(control, value, messageType = 'input'){
 	return without(message, undefined, null);
 }
 
-exports.controlMessage = controlMessage
-exports.findControl = findControl
-exports.getControlType = getControlType
-exports.findBank = findBank
-exports.messages = messages
+export {
+	controlMessage,
+	findControl,
+	getControlType,
+	findBank,
+	messages
+}

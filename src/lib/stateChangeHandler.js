@@ -40,4 +40,4 @@ function stateChangeHandler(event, device) {
 
 }
 
-module.exports = stateChangeHandler
+export { stateChangeHandler as default }

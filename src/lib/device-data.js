@@ -24,4 +24,4 @@ const deviceData = {
 	}
 }
 
-module.exports = deviceData
+export { deviceData as default }

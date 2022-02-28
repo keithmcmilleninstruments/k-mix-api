@@ -45,7 +45,7 @@
 • Aux 3 Panning = CC 28
 • Input Trim = CC 29
 */
-let input_channel_params = {
+const input_channel_params = {
 	"fader": 1,
 	"mute": 2,
 	"eq-bypass": 3,
@@ -102,7 +102,7 @@ let input_channel_params = {
 • Compressor Makeup Gain = CC 21
 */
 
-let main_output_bus_params = {
+const main_output_bus_params = {
 	"fader": 1,
 	"mute": 2,
 	"eq-bypass": 3,
@@ -151,7 +151,7 @@ let main_output_bus_params = {
 • Aux 3 Mute = CC 28
 */
 
-let misc_params = {
+const misc_params = {
 	"reverb-send-1": 1,
 	"reverb-send-2": 2,
 	"reverb-send-3": 3,
@@ -185,6 +185,8 @@ let misc_params = {
 // CHANGING PRESETS WITH PROGRAM CHANGE MESSAGES sent to any channel on  K-Mix Audio Control port
 // Program Change : 0xCx; [C0,1] set preset 1
 
-exports.input_channel_params = input_channel_params
-exports.main_output_bus_params = main_output_bus_params
-exports.misc_params = misc_params
+export {
+	input_channel_params,
+	main_output_bus_params,
+	misc_params
+}

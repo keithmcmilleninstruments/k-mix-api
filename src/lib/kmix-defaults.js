@@ -45,4 +45,4 @@ const KMIXDefaults = {
 	"transport-right": {"bank_1": 29, "bank_2": 29, "bank_3": 29, "mode": "momentary", "type": [144, 128]}
 };
 
-module.exports = KMIXDefaults
+export { KMIXDefaults as default }

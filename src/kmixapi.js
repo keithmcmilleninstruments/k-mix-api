@@ -8,7 +8,7 @@ import deviceData from './lib/device-data';
 import kmixDefaults from "./lib/kmix-defaults";
 import midiMessageHandler from "./lib/midiMessageHandler";
 import stateChangeHandler from "./lib/stateChangeHandler";
-import { controlMessageFromOptions } from './lib/control-message-from-options';
+import controlMessageFromOptions from './lib/control-message-from-options';
 import { controlMessage, getControlType } from "./lib/control-message";
 import { help } from "./lib/help";
 
