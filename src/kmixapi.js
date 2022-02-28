@@ -79,7 +79,7 @@ export default class KMIX {
 		this.ee.on(name, cb)
 	}
 
-	off(name) {
+	off(name, cb) {
 		this.ee.off(name, cb)
 	}
 

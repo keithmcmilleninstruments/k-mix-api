@@ -17802,7 +17802,7 @@ var KMIX = (function () {
 		// send out event for controlName
 		device.emit(controlName + kind, payload(data));
 		// if listening for any event
-		if(device.listeners('any', true)){
+		if(device.ee.has('any')){
 			device.emit('any', anyPayload(controlName + kind, data));
 		}
 
@@ -17990,7 +17990,7 @@ var KMIX = (function () {
 			this.ee.on(name, cb);
 		}
 
-		off(name) {
+		off(name, cb) {
 			this.ee.off(name, cb);
 		}
 
