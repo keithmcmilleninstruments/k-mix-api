@@ -98,7 +98,7 @@ export default class KMIX extends EventEmitter {
 				// to control-surface : send('control:button-vu',0), send('control:fader-1', 64)
 				port = ports[1];
 				control = control.split(':')[1]
-				message = controlMessageFromOptions(control, value, bank, options)
+				message = controlMessageFromOptions(control, value, bank, this.options)
 
 				break;
 
@@ -150,5 +150,5 @@ export default class KMIX extends EventEmitter {
 		}
 	}
 
-	help = (() => partial(help, options))()
+	help = (() => partial(help, this.options))()
 }

@@ -18263,8 +18263,7 @@ var KMIX = (function () {
 		}
 	}
 
-	let options = {},
-		names = ['bank_1', 'bank_2', 'bank_3', 'mode'];
+	let names = ['bank_1', 'bank_2', 'bank_3', 'mode'];
 
 	class KMIX extends EventEmitter {
 		constructor(midi, userOptions = {}, debug = false){
@@ -18343,7 +18342,7 @@ var KMIX = (function () {
 
 				case 'control':
 					control = control.split(':')[1];
-					message = controlMessageFromOptions(control, value, bank, options);
+					message = controlMessageFromOptions(control, value, bank, this.options);
 
 					break;
 
@@ -18393,7 +18392,7 @@ var KMIX = (function () {
 			}
 		}
 
-		help = (() => lodash.exports.partial(help, options))()
+		help = (() => lodash.exports.partial(help, this.options))()
 	}
 
 	return KMIX;
