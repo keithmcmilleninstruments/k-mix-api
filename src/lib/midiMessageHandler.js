@@ -25,7 +25,7 @@ function midiMessageHandler(event, device){
 	// send out event for controlName
 	device.emit(controlName + kind, payload(data))
 	// if listening for any event
-	if(device.ee.has('any')){
+	if(device.ee.all.has('any')){
 		device.emit('any', anyPayload(controlName + kind, data))
 	}
 
