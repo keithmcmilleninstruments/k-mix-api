@@ -18264,13 +18264,12 @@ var KMIX = (function () {
 	}
 
 	let options = {},
-		ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
 		names = ['bank_1', 'bank_2', 'bank_3', 'mode'];
 
 	class KMIX extends EventEmitter {
 		constructor(midi, userOptions = {}, debug = false){
 			super();
-			
+
 			this.deviceName = 'K-Mix';
 			this._debug = debug;
 			// store port connection status
@@ -18322,8 +18321,9 @@ var KMIX = (function () {
 		}
 
 		send(control, value, bank = 1, time = 0) {
-			let message, sendTime,
-					controlType = getControlType(control);
+			let message, 
+				sendTime,
+				controlType = getControlType(control);
 
 			sendTime = time;
 
@@ -18332,32 +18332,26 @@ var KMIX = (function () {
 					// raw : send([176,1,127], time)
 					message = control;
 					time = value || 0;
-					port = ports[0];
 
 					break;
 
 				case 'raw-control':
 					// raw-control : send('control',[176,1,127], time)
 					message = value;
-					port = ports[1];
 
 					break;
 
 				case 'control':
-					// to control-surface : send('control:button-vu',0), send('control:fader-1', 64)
-					port = ports[1];
 					control = control.split(':')[1];
 					message = controlMessageFromOptions(control, value, bank, options);
 
 					break;
 
 				case 'raw-expander':
-					port = ports[2];
 					control = control.split(':')[1];
 					message = value;
 
 				case 'expander':
-					port = ports[2];
 					control = control.split(':')[1];
 					message = value;
 

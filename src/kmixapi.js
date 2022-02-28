@@ -19,7 +19,7 @@ let options = {},
 export default class KMIX extends EventEmitter {
 	constructor(midi, userOptions = {}, debug = false){
 		super()
-		
+
 		this.deviceName = 'K-Mix'
 		this._debug = debug
 		// store port connection status
@@ -71,8 +71,10 @@ export default class KMIX extends EventEmitter {
 	}
 
 	send(control, value, bank = 1, time = 0) {
-		let message, sendTime,
-				controlType = getControlType(control);
+		let port = ports[0], 
+			message, 
+			sendTime,
+			controlType = getControlType(control);
 
 		sendTime = time
 
