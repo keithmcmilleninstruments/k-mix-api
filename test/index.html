@@ -6,8 +6,17 @@
     <title>KMIX API Tester</title>
 </head>
 <body>
+    <div id="kmixlog"></div>
+    <script src="../dist/kmix-api.js"></script>
     <script>
-        
+        let midi, kmix
+        (async () => {
+            midi = await navigator.requestMIDIAccess()
+            kmix = new KMIX(midi, {}, false)
+            kmix.on('any', data => {
+                console.log('data', data)
+            })
+        })()
     </script>
 </body>
 </html>

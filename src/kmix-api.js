@@ -1,20 +1,17 @@
 import EventEmitter from 'eventemitter3';
-import { merge, initial, partial } from "lodash"
+import merge from "lodash.merge"
+import initial from "lodash.initial"
 
 // modules
-import createDeviceList from 'midi-ports';
 import { storePortConnections, convertOptions } from './lib/utilities'
-import deviceData from './lib/device-data';
 import kmixDefaults from "./lib/kmix-defaults";
 import midiMessageHandler from "./lib/midiMessageHandler";
 import stateChangeHandler from "./lib/stateChangeHandler";
 import controlMessageFromOptions from './lib/control-message-from-options';
 import { controlMessage, getControlType } from "./lib/control-message";
-import { help } from "./lib/help";
+import helpRequest from "./lib/help";
 
-let options = {},
-	ports = ['k-mix-audio-control', 'k-mix-control-surface', 'k-mix-expander'],
-	names = ['bank_1', 'bank_2', 'bank_3', 'mode']
+let names = ['bank_1', 'bank_2', 'bank_3', 'mode']
 
 export default class KMIX extends EventEmitter {
 	constructor(midi, userOptions = {}, debug = false){
@@ -29,6 +26,7 @@ export default class KMIX extends EventEmitter {
 			expander: {input: false, output: false}
 		}
 
+		// ports
 		this.audioControl = {input: null, output: null}
 		this.controlSurface = {input: null, output: null}
 		this.expander = {input: null, output: null}
@@ -42,87 +40,82 @@ export default class KMIX extends EventEmitter {
 		let newOptions = convertOptions(userOptions, names)
 		// make options
 		this.options = merge(kmixDefaults, newOptions)
-		// make devices object
-		this.devices = createDeviceList(this.midi, deviceData)
 
 		// store ports and connecitons
 		this.midi.inputs.forEach(input => storePortConnections(input, this))
 		this.midi.outputs.forEach(output => storePortConnections(output, this))
 
-		if(!this.controlSurface.input) return
+		if(!this.controlSurface.input) {
+			console.error('> K-Mix API: Control Surface Port not connected')
+			return
+		}
 
-		// set main ports
+		// set default ports
 		this.input = this.controlSurface.input
 		this.output = this.audioControl.output
 
-		// debug
-		if(this._debug){
-			this.inputDebug = this.audioControl.input
-			this.inputDebug.onmidimessage = (e) => {
-				// add formatted console logging
-				midiMessageHandler(e, this)
-			}
-		} else { // set event handler
-			this.input.onmidimessage = (e) => {
-				// add formatted console logging
-				midiMessageHandler(e, this)
-			}
+		// set listener for messages
+		this.input.onmidimessage = (e) => {
+			// add formatted console logging
+			midiMessageHandler(e, this)
 		}
 	}
 
 	send(control, value, bank = 1, time = 0) {
-		let port = ports[0], 
-			message, 
-			sendTime,
+		let output, message, sendTime,
 			controlType = getControlType(control);
 
-		sendTime = time
+		sendTime = parseInt(time)
 
 		switch(controlType){
 			case 'raw':
 				// raw : send([176,1,127], time)
 				message = control
 				time = value || 0
-				port = ports[0];
+				output = this.audioControl.output
 
 				break;
 
 			case 'raw-control':
 				// raw-control : send('control',[176,1,127], time)
 				message = value
-				port = ports[1];
+				output = this.controlSurface.output
 
 				break;
 
 			case 'control':
 				// to control-surface : send('control:button-vu',0), send('control:fader-1', 64)
-				port = ports[1];
 				control = control.split(':')[1]
 				message = controlMessageFromOptions(control, value, bank, this.options)
-
+				output = this.controlSurface.output
+				
 				break;
 
 			case 'raw-expander':
-				port = ports[2]
 				control = control.split(':')[1]
 				message = value
+				output = this.expander.output
+				
+				break;
 
 			case 'expander':
-				port = ports[2]
 				control = control.split(':')[1]
 				message = value
+				output = this.expander.output
+				
+				break;
 
 			default: // 'input', 'main', 'misc', 'preset'
 				// to audio control : send('fader:1', value, time)
 				message = controlMessage(control, value, controlType)
-
+				output = this.audioControl.output
 				break;
 		}
 
 		if(message.length < 3 && controlType !== 'preset') {
 			console.warn('>> K-Mix: Please check control name');
 		} else {
-			this.output.send(message,  window.performance.now() + sendTime)
+			output.send(message,  window.performance.now() + sendTime)
 		}
 	}
 
@@ -131,24 +124,17 @@ export default class KMIX extends EventEmitter {
 			case 'all':
 				return Object.values(this.connections).every(port => port.input && port.output)
 			case 'audio-control':
-				return Object.values(this.connections).every(port => {
-					if(port !== 'audioControl') return
-					return port.input && port.output
-				})
+				return Object.values(this.connections.audioControl).every(Boolean)
 			case 'control-surface':
-			return Object.values(this.connections).every(port => {
-				if(port !== 'controlSurface') return
-				return port.input && port.output
-			})
+				return Object.values(this.connections.controlSurface).every(Boolean)
 			case 'expander':
-			return Object.values(this.connections).every(port => {
-				if(port !== 'expander') return
-				return port.input && port.output
-			})
+				return Object.values(this.connections.expander).every(Boolean)
 			default:
 				return false
 		}
 	}
 
-	help = (() => partial(help, this.options))()
+	help = (request) => {
+		helpRequest(this.options, request)
+	}
 }

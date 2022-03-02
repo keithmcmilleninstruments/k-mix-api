@@ -1,5 +1,5 @@
 // vendor
-import { omit } from "lodash";
+import omit from "lodash.omit";
 // modules
 import { messages as CCTables } from "./control-message";
 
@@ -9,11 +9,11 @@ function helpObject(obj, message = 'control'){
 	});
 }
 
-function help(options, request){
+function helpRequest(options, request){
 	switch(request){
 		case 'input':
 			console.log('\nhelp:input');
-			console.table(helpObject(CCTables[0], 'control: per-channel 1 -8'))
+			console.table(helpObject(CCTables[0], 'control: per-channel 1 - 8'))
 			break;
 		case 'main':
 			console.log('\nhelp:main');
@@ -25,12 +25,13 @@ function help(options, request){
 			break;
 		case 'control':
 			console.log('\nhelp:control. What channels are assigned to each control/bank, Editor MIDI tab');
+			console.log(omit(options, 'midi-channels'))
 			console.table(omit(options, 'midi-channels')); // omit type
 			break;
 	}
 }
 
 export {
-	help,
+	helpRequest as default,
 	helpObject
 }

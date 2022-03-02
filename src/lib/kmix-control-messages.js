@@ -1,5 +1,3 @@
-// convert each to Map
-
 /*
 • MIDI Channel 1 = Input Channel 1 Settings
 • MIDI Channel 2 = Input Channel 2 Settings

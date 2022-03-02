@@ -1,4 +1,4 @@
-import { omit } from "lodash"
+import omit from "lodash.omit"
 
 import { findControl, findBank } from "./control-message";
 import { payload, anyPayload } from "./utilities"
@@ -46,7 +46,7 @@ function midiMessageHandler(event, device){
 
 		console.log('Event Debug', debugLog);
 	}
-	if(kmixLog) kmixLog.innerHTML = controlName + '<br>from ' + port + '<br>portID ' + e.target.id + '<br>' + data + '<br>channel ' + (channel + 1);
+	if(kmixLog) kmixLog.innerHTML = controlName + '<br>from ' + port + '<br>portID ' + event.target.id + '<br>' + data + '<br>channel ' + (channel + 1);
 }
 
 export { midiMessageHandler as default }

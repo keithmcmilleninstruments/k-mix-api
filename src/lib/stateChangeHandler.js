@@ -6,10 +6,13 @@ function stateChangeHandler(event, device) {
 
   if(!name.includes(device.deviceName)) return
 
-  if(window._debugStateChange) console.log('>> K-Mix State', event.port)
+  if(device._debug === 'state') console.log('>> K-Mix State', event.port)
 
   const cleanName = camelcase(name.replace('K-Mix ',''))
-
+  
+  // ignore HUI
+  if(cleanName.includes('Hui')) return
+  
   switch (name) {
     case 'K-Mix Audio Control':
       portName = cleanName

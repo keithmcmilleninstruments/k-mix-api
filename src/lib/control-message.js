@@ -1,5 +1,7 @@
 // vendor
-import { without, findKey, indexOf } from 'lodash'
+import without from 'lodash.without'
+import findKey from 'lodash.findkey'
+import indexOf from 'lodash.indexof'
 
 // modules
 import { isEqual } from './utilities'

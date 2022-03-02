@@ -1,5 +1,5 @@
+import zipObject from 'lodash.zipobject';
 import camelcase from 'camelcase'
-import { zipObject } from 'lodash';
 
 export function isEqual(a, b){
 	return a === b;
@@ -30,18 +30,18 @@ export function convertRange( value, r1, r2 ) {
 }
 
 export function payload(data){
-	let value = data[2];
  	return {
-		value: value,
+		channel: (data[0] & 0xf) + 1,
+		value:  data[2],
 		raw: data
 	}
 }
 
 export function anyPayload(control, data){
-	let value = data[2];
  	return {
  		control: control,
-		value: value,
+		channel: (data[0] & 0xf) + 1,
+		value: data[2],
 		raw: data
 	}
 }
@@ -57,6 +57,9 @@ export function storePortConnections(port, device) {
 	if(!name.includes(device.deviceName)) return
 
 	const cleanName = camelcase(name.replace(`${device.deviceName} `,''))
+	
+	// ignore HUI
+	if(cleanName.includes('Hui')) return
 
 	device.connections[cleanName][type] = state === 'connected' ? true : false
 

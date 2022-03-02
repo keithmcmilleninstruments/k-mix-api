@@ -149,7 +149,7 @@ kmix.send('fader:1', 127, time) // sent in 'time in ms'
 kmix.send('eq-high-frequency:1', 127)
 
 // Main Fader
-kmix.send('main:mute', 11) // sends on channel 9
+kmix.send('main:mute', 1) // 1 = muted, 0 = unmuted - sends on channel 9
 
 // Misc
 kmix.send('misc:reverb-level', 100) // sends on channel 10

@@ -1,5 +1,5 @@
 // vendor
-import { without } from 'lodash'
+import without from 'lodash.without'
 
 function controlMessageFromOptions(control, value, bank, options){
 	let banks = ['bank_1', 'bank_2', 'bank_3'],
