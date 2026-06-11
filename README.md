@@ -98,7 +98,7 @@ kmix.isConnected('audio-control')
 // --> true when audio-control port is connected
 ```
 
-When K-Mix is in one of 3 MIDI Bank modes it sends out events named for the control that is sending out data. For example, if you move the main fader, an event of 'fader:main' is sent out along with the fader data for that event.
+When K-Mix is in one of 3 MIDI Bank modes it sends out events named for the control that is sending out data. For example, if you move the main fader, an event of 'fader-main' is sent out along with the fader data for that event.
 
 ```js
 // fader-1

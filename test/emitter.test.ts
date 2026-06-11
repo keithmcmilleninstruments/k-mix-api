@@ -39,4 +39,20 @@ describe('EventEmitter', () => {
     ee.on('x', () => {})
     expect(ee.listenerCount('x')).toBe(1)
   })
+
+  test('listeners returns the registered handlers', () => {
+    const ee = new EventEmitter()
+    const fn = () => {}
+    ee.on('x', fn)
+    expect(ee.listeners('x')).toContain(fn)
+  })
+
+  test('off without a handler clears all listeners for the event', () => {
+    const ee = new EventEmitter()
+    const fn = vi.fn()
+    ee.on('x', fn)
+    ee.off('x')
+    ee.emit('x', 1)
+    expect(fn).not.toHaveBeenCalled()
+  })
 })

@@ -133,6 +133,15 @@ describe('connection events', () => {
     expect(fn).not.toHaveBeenCalled()
   })
 
+  test("debug 'state' logs port state changes", () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const mock = createMockMidi(PORTS.filter((p) => p.id !== 'ex-out'))
+    new KMIX(mock.access, {}, 'state')
+    mock.connect({ id: 'ex-out', name: 'K-Mix Expander', type: 'output' })
+    expect(log).toHaveBeenCalledWith('>> K-Mix State', expect.anything())
+    log.mockRestore()
+  })
+
   test('re-attaches input on hot-plug: inbound keeps working after reconnect', () => {
     const mock = fullRig()
     const kmix = new KMIX(mock.access)

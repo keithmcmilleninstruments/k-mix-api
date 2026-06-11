@@ -59,4 +59,45 @@ describe('handleMidiMessage', () => {
       raw: [176, 1, 100],
     })
   })
+
+  test('unmatched control emits an empty-name control with payload', () => {
+    const ee = new EventEmitter()
+    const anyFn = vi.fn()
+    ee.on('any', anyFn)
+    // CC 176, control number 99 matches no configured control on bank_1
+    handleMidiMessage(midiEvent([176, 99, 50]), ctx(ee))
+    expect(anyFn).toHaveBeenCalledWith({ control: '', channel: 1, value: 50, raw: [176, 99, 50] })
+  })
+
+  test('debug=true logs Event Debug for a control-surface message', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const ee = new EventEmitter()
+    handleMidiMessage(midiEvent([176, 1, 100]), {
+      banks,
+      options: mergeOptions({}),
+      emitter: ee,
+      debug: true,
+    })
+    expect(log).toHaveBeenCalledWith(
+      'Event Debug',
+      expect.objectContaining({ control: 'fader-1', port: 'K-Mix Control Surface' }),
+    )
+    log.mockRestore()
+  })
+
+  test('debug=true on the Audio Control port omits control and uses data[7] for channel', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const ee = new EventEmitter()
+    const data = [176, 1, 100, 0, 0, 0, 0, 4] // data[7] = 4 -> channel 5
+    handleMidiMessage(midiEvent(data, 'K-Mix Audio Control'), {
+      banks,
+      options: mergeOptions({}),
+      emitter: ee,
+      debug: true,
+    })
+    const arg = log.mock.calls.at(-1)?.[1] as Record<string, unknown>
+    expect(arg).not.toHaveProperty('control')
+    expect(arg.channel).toBe(5)
+    log.mockRestore()
+  })
 })

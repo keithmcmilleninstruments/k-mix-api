@@ -19,3 +19,17 @@ test('help("control") omits midi-channels from the printed options', () => {
   expect(printed).not.toHaveProperty('midi-channels')
   expect(printed).toHaveProperty('fader-1')
 })
+
+test('help("main") prints the main CC table', () => {
+  const table = vi.spyOn(console, 'table').mockImplementation(() => {})
+  vi.spyOn(console, 'log').mockImplementation(() => {})
+  help(mergeOptions({}), 'main')
+  expect(table).toHaveBeenCalledTimes(1)
+})
+
+test('help("misc") prints the misc CC table', () => {
+  const table = vi.spyOn(console, 'table').mockImplementation(() => {})
+  vi.spyOn(console, 'log').mockImplementation(() => {})
+  help(mergeOptions({}), 'misc')
+  expect(table).toHaveBeenCalledTimes(1)
+})
