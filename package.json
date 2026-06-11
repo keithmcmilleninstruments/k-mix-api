@@ -1,6 +1,6 @@
 {
   "name": "k-mix-api",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "Web MIDI API for full control of Keith McMillen Instruments K-Mix",
   "author": "Andrej Hronco <andrej@andrejhronco.com> (https://andrejhronco.com)",
   "license": "ISC",
