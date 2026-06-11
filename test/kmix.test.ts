@@ -114,4 +114,37 @@ describe('connection events', () => {
     mock.connect({ id: 'ex-out', name: 'K-Mix Expander', type: 'output' })
     expect(fn).toHaveBeenCalled()
   })
+
+  test('emits disconnected when the last port goes away', () => {
+    const mock = fullRig()
+    const kmix = new KMIX(mock.access)
+    const fn = vi.fn()
+    kmix.on('disconnected', fn)
+    for (const p of PORTS) mock.disconnect(p)
+    expect(fn).toHaveBeenCalled()
+  })
+
+  test('connected is edge-triggered: an unrelated port change does not re-emit', () => {
+    const mock = fullRig()
+    const kmix = new KMIX(mock.access)
+    const fn = vi.fn()
+    kmix.on('connected', fn)
+    mock.connect({ id: 'other', name: 'Some Other Synth', type: 'output' })
+    expect(fn).not.toHaveBeenCalled()
+  })
+
+  test('re-attaches input on hot-plug: inbound keeps working after reconnect', () => {
+    const mock = fullRig()
+    const kmix = new KMIX(mock.access)
+    const fn = vi.fn()
+    kmix.on('fader-1', fn)
+    mock.disconnect({ id: 'cs-in', name: 'K-Mix Control Surface', type: 'input' })
+    mock.connect({ id: 'cs-in', name: 'K-Mix Control Surface', type: 'input' })
+    const input = mock.access.inputs.get('cs-in') as MIDIInput
+    input.onmidimessage?.({
+      data: Uint8Array.from([176, 1, 100]),
+      target: input,
+    } as unknown as MIDIMessageEvent)
+    expect(fn).toHaveBeenCalledWith({ channel: 1, value: 100, raw: [176, 1, 100] })
+  })
 })

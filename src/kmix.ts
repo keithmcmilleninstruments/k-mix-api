@@ -26,12 +26,21 @@ export class KMIX extends EventEmitter {
   readonly banks = ['bank_1', 'bank_2', 'bank_3']
   private readonly ports: MidiPorts
   private readonly debug: KmixDebug
+  // Last-emitted aggregate state, so connection events are edge-triggered:
+  // 'connected' fires only on the transition into all-present, 'disconnected'
+  // only on the transition into all-gone. Seeded from current state below so
+  // construction itself never emits (matching legacy, which only emitted on
+  // statechange events).
+  private wasConnected: boolean
+  private wasDisconnected: boolean
 
   constructor(midi: MIDIAccess, userOptions: UserOptions = {}, debug: KmixDebug = false) {
     super()
     this.debug = debug
     this.options = mergeOptions(userOptions)
     this.ports = createMidiPorts(midi, { devices: DEVICES })
+    this.wasConnected = this.isConnected('all')
+    this.wasDisconnected = this.allGone()
 
     // statechange covers connect, disconnect, and 'change' (a half-connected
     // port gaining its other half) — the latter never fires on connect/disconnect.
@@ -70,13 +79,22 @@ export class KMIX extends EventEmitter {
     return !!(port?.input && port?.output)
   }
 
+  private allGone(): boolean {
+    const all = [this.audioControl, this.controlSurface, this.expander]
+    return all.every((p) => !(p?.input || p?.output))
+  }
+
   private onConnectionChange(event: MidiPortEvent): void {
     if (this.debug === 'state') console.log('>> K-Mix State', event.port)
     // Re-attach the inbound listener so input keeps working after a reconnect.
     this.attachInput()
-    const all = [this.audioControl, this.controlSurface, this.expander]
-    if (all.every((p) => this.bothConnected(p))) this.emit('connected')
-    if (all.every((p) => !(p?.input || p?.output))) this.emit('disconnected')
+    const currentlyConnected = this.isConnected('all')
+    const currentlyDisconnected = this.allGone()
+    // Edge-trigger: emit only on the transition into each aggregate state.
+    if (currentlyConnected && !this.wasConnected) this.emit('connected')
+    if (currentlyDisconnected && !this.wasDisconnected) this.emit('disconnected')
+    this.wasConnected = currentlyConnected
+    this.wasDisconnected = currentlyDisconnected
   }
 
   send(control: string | number[], value?: number | number[], bank = 1, time = 0): void {
