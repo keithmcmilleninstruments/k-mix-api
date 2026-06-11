@@ -3,12 +3,17 @@ Javascript API for fully controlling Keith McMillen Instruments [K-Mix](https://
 
 K-Mix has 3 MIDI Bank modes in addition to the main Mix Bank, which gives you a total of 32 faders, 12 rotaries, and 87 buttons of assignable controls.
 
-##Install
+## Install
+
 ```bash
 npm install k-mix-api
 ```
 
-##Usage
+`k-mix-api` is ESM-only and ships TypeScript types. It depends on
+[`midi-ports`](https://github.com/andrejhronco/midi-ports) for cross-platform
+port resolution and hot-plug handling.
+
+## Usage
 ```js
 import KMIX from 'k-mix-api'
 
@@ -21,6 +26,16 @@ navigator.requestMIDIAccess()
 		// KMIX(midi [, options = {}, debug = false])
 		kmix = new KMIX(midi)
 	})
+```
+
+### TypeScript
+
+```ts
+import KMIX, { type KmixOptions } from 'k-mix-api'
+
+const midi = await navigator.requestMIDIAccess()
+const kmix = new KMIX(midi)
+kmix.on('fader-1', (data) => console.log('fader-1', data))
 ```
 
 ##Options
