@@ -199,8 +199,9 @@ Coverage via `@vitest/coverage-v8`, `include: ['src/**']`.
 2. **Release auth:** **OIDC Trusted Publisher** (matches midi-ports). Requires
    npm-side configuration on the `k-mix-api` package; can fall back to
    `NPM_TOKEN` if preferred.
-3. **`test/index.html`:** dropped in favor of Vitest. A `demo/` page is out of
-   scope for this effort.
+3. **`test/index.html`:** dropped in favor of Vitest. A browser `demo/`
+   playground (modeled on midi-ports' `demo/`) is a **deferred follow-up** —
+   wanted, but landed after this modernization effort, not within it.
 4. **Version:** ship as **2.0.0** via a Changeset (major: ESM-only, new build,
    TS, midi-ports adoption).
 5. **`midi-ports` as a direct dependency** (not peer), pinned to its current
@@ -209,5 +210,5 @@ Coverage via `@vitest/coverage-v8`, `include: ['src/**']`.
 ## 10. Out of Scope
 
 - New K-Mix features or control coverage beyond what 1.5.0 exposes.
-- A rebuilt browser demo / playground.
+- A rebuilt browser demo / playground (deferred follow-up — see §9.3).
 - Changing the MIDI message semantics or the CC tables.
