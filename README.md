@@ -38,7 +38,22 @@ const kmix = new KMIX(midi)
 kmix.on('fader-1', (data) => console.log('fader-1', data))
 ```
 
-##Options
+## Demo
+
+A browser playground lives in [`demo/`](./demo/index.html). It exercises the full
+API — live connection status, inbound control events, and every `send()` routing
+(input faders/mutes, main bus, misc, presets, control-surface LEDs, raw bytes).
+
+```bash
+pnpm install
+pnpm run build      # the demo imports the local ./dist build
+npx http-server     # serve the repo root, then open /demo/
+```
+
+A real K-Mix isn't required to load the page; put K-Mix in a MIDI Bank mode to
+see inbound control events stream in.
+
+## Options
 The options object is a reflection of your K-Mix settings in the MIDI tab of the [K-Mix Editor](https://www.keithmcmillen.com/downloads#kmix), allowing you to specify what midi channels you want to use with K-Mix and what CC messages each fader, rotary, and button outputs on a per bank level. Please consult the [K-Mix Manual](https://files.keithmcmillen.com/products/k-mix/documentation/kmix-manual.pdf) Section 5.2.4.
 
 Any fader, rotary, and button that is in the default setting can be omitted from the options object. Only add what you have changed.

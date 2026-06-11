@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>k-mix-api 2.0 demo</title>
+    <style>
+      body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem; max-width: 820px; }
+      h1 { font-size: 1.2rem; }
+      h2 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
+      .sub { color: #666; margin-top: -0.5rem; }
+      .sub b { color: #333; }
+      button { font: inherit; padding: 0.3rem 0.7rem; cursor: pointer; }
+      input[type="text"], input[type="number"] { font: inherit; padding: 0.25rem 0.4rem; }
+      label { margin-right: 0.8rem; }
+      code { background: #eef2f2; padding: 0 3px; border-radius: 3px; }
+      .panel { border: 1px solid #cdd; background: #f6f9f9; border-radius: 8px; padding: 0.4rem 0.9rem 0.9rem; margin: 0.8rem 0; }
+      .panel h2 { margin-top: 0.8rem; }
+      .hint { color: #678; font-size: 12px; }
+      .status { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin: 0.4rem 0; }
+      .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #c33; margin-right: 6px; vertical-align: middle; }
+      .dot.on { background: #2a2; }
+      .row { display: flex; align-items: center; gap: 0.6rem; margin: 0.35rem 0; flex-wrap: wrap; }
+      .row > .name { width: 7rem; color: #445; }
+      .row input[type="range"] { width: 200px; }
+      .row .val { width: 2.4rem; text-align: right; color: #678; font: 12px ui-monospace, monospace; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.4rem; }
+      .led { border: 1px solid #bcc; border-radius: 6px; background: #eef; padding: 0.4rem; }
+      .led.on { background: #2a2; color: #fff; border-color: #198; }
+      #log { background: #111; color: #0f0; padding: 0.8rem; height: 240px; overflow: auto;
+             font: 12px/1.4 ui-monospace, monospace; border-radius: 6px; white-space: pre-wrap; }
+      .warn { color: #a40; }
+    </style>
+  </head>
+  <body>
+    <h1>k-mix-api 2.0 demo</h1>
+    <p class="sub">
+      Full Web MIDI control of the KMI <b>K-Mix</b> — powered by <b>k-mix-api</b>
+      (on <b>midi-ports</b> for topology &amp; hot-plug)
+    </p>
+    <p>
+      <button id="start">Request MIDI access</button>
+      <span id="status">idle</span>
+      <label style="margin-left: 1rem;"><input type="checkbox" id="debug" /> debug</label>
+    </p>
+    <p class="hint">
+      No K-Mix attached? The page still loads and shows the API — sends will warn
+      until the Control Surface / Audio Control ports appear. Put K-Mix in a MIDI
+      Bank mode (shift + a numbered transport button) to receive control events.
+    </p>
+
+    <div id="app" hidden>
+      <div class="panel">
+        <h2>Connection <span class="hint">— <code>kmix.isConnected(port)</code></span></h2>
+        <div class="status" id="conn"></div>
+        <p class="hint">Updates live on <code>connected</code>/<code>disconnected</code> events and raw port state changes.</p>
+      </div>
+
+      <div class="panel">
+        <h2>Send to K-Mix <span class="hint">— <code>kmix.send(control, value[, bank])</code></span></h2>
+
+        <h2>Audio Control — input channels <span class="hint"><code>send('fader:N', v)</code> · <code>send('mute:N', 0|127)</code></span></h2>
+        <div id="inputs"></div>
+
+        <h2>Audio Control — main &amp; misc</h2>
+        <div class="row">
+          <span class="name">main fader</span>
+          <input type="range" min="0" max="127" value="100" id="mainFader" />
+          <span class="val" id="mainFaderVal">100</span>
+          <span class="hint"><code>send('main:fader', v)</code></span>
+        </div>
+        <div class="row">
+          <span class="name">reverb level</span>
+          <input type="range" min="0" max="127" value="64" id="reverb" />
+          <span class="val" id="reverbVal">64</span>
+          <span class="hint"><code>send('misc:reverb-level', v)</code></span>
+        </div>
+        <div class="row">
+          <span class="name">preset</span>
+          <input type="number" min="0" max="127" value="0" id="preset" style="width: 4rem;" />
+          <button id="presetSend">Recall preset</button>
+          <span class="hint"><code>send('preset', n)</code> — program change</span>
+        </div>
+
+        <h2>Control Surface — button LEDs <span class="hint"><code>send('control:&lt;name&gt;', 1|0, bank)</code></span></h2>
+        <div class="row">
+          <span class="name">bank</span>
+          <label><input type="radio" name="bank" value="1" checked /> 1</label>
+          <label><input type="radio" name="bank" value="2" /> 2</label>
+          <label><input type="radio" name="bank" value="3" /> 3</label>
+        </div>
+        <div class="grid" id="leds"></div>
+
+        <h2>Raw bytes <span class="hint"><code>send([status, data1, data2])</code> → Audio Control out</span></h2>
+        <div class="row">
+          <input type="text" id="raw" value="176, 1, 127" size="18" />
+          <button id="rawSend">Send raw</button>
+          <span class="hint">e.g. <code>176, 1, 127</code> = CC1 on ch1</span>
+        </div>
+      </div>
+
+      <h2>Inbound events <span class="hint">— <code>kmix.on('any', …)</code></span></h2>
+      <div id="log"></div>
+    </div>
+
+    <!--
+      k-mix-api's build keeps its one dependency (midi-ports) as a bare ESM
+      import, so the browser needs an import map to resolve it. We point it at
+      the locally-installed copy, which means this demo must be served from the
+      repo root (so /dist and /node_modules are reachable), e.g. `npx
+      http-server` then open /demo/. To run without a local install instead,
+      swap the target for a CDN URL like https://esm.sh/midi-ports@3.
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "midi-ports": "../node_modules/midi-ports/dist/index.js"
+        }
+      }
+    </script>
+
+    <script type="module">
+      // k-mix-api is loaded from the local build — run `pnpm run build` (or
+      // `pnpm run dev`) first, then serve from the repo root and open /demo/.
+      // ESM-only, so no bundler is needed.
+      import KMIX from '../dist/index.js'
+
+      const $ = (id) => document.getElementById(id)
+
+      // Batched, bounded logging. K-Mix can emit control events faster than the
+      // DOM can paint (sweeping a fader), so buffer lines and flush once per
+      // frame, capping the buffer so a backlog can't build up.
+      const MAX_LOG_LINES = 300
+      const logLines = []
+      let flushScheduled = false
+      const flushLog = () => {
+        flushScheduled = false
+        const el = $('log')
+        el.textContent = logLines.join('\n')
+        el.scrollTop = el.scrollHeight
+      }
+      const log = (msg) => {
+        logLines.push(`${new Date().toLocaleTimeString()}  ${msg}`)
+        if (logLines.length > MAX_LOG_LINES) logLines.splice(0, logLines.length - MAX_LOG_LINES)
+        if (!flushScheduled) {
+          flushScheduled = true
+          requestAnimationFrame(flushLog)
+        }
+      }
+
+      let access // raw MIDIAccess (kept so we can watch raw statechange)
+      let kmix // KMIX instance
+
+      const PORTS = [
+        ['all', 'All ports'],
+        ['audio-control', 'Audio Control'],
+        ['control-surface', 'Control Surface'],
+        ['expander', 'Expander'],
+      ]
+
+      // ---- connection status ---------------------------------------------------
+      function renderStatus() {
+        const el = $('conn')
+        el.innerHTML = ''
+        for (const [key, label] of PORTS) {
+          const on = kmix?.isConnected(key) ?? false
+          const span = document.createElement('span')
+          const dot = document.createElement('span')
+          dot.className = on ? 'dot on' : 'dot'
+          span.append(dot, `${label}: ${on ? 'connected' : '—'}`)
+          el.appendChild(span)
+        }
+      }
+
+      // ---- send helpers --------------------------------------------------------
+      const currentBank = () =>
+        Number(document.querySelector('input[name="bank"]:checked')?.value || 1)
+
+      function buildInputChannels() {
+        const container = $('inputs')
+        container.innerHTML = ''
+        // 8 input channels: a fader and a mute toggle each.
+        for (let ch = 1; ch <= 8; ch++) {
+          const row = document.createElement('div')
+          row.className = 'row'
+
+          const name = document.createElement('span')
+          name.className = 'name'
+          name.textContent = `channel ${ch}`
+          row.appendChild(name)
+
+          const fader = document.createElement('input')
+          fader.type = 'range'
+          fader.min = '0'
+          fader.max = '127'
+          fader.value = '100'
+          const val = document.createElement('span')
+          val.className = 'val'
+          val.textContent = '100'
+          fader.oninput = () => {
+            val.textContent = fader.value
+            send(`fader:${ch}`, Number(fader.value))
+          }
+          row.append(fader, val)
+
+          const mute = document.createElement('button')
+          let muted = false
+          mute.textContent = 'mute'
+          mute.onclick = () => {
+            muted = !muted
+            mute.style.background = muted ? '#c33' : ''
+            mute.style.color = muted ? '#fff' : ''
+            send(`mute:${ch}`, muted ? 127 : 0)
+          }
+          row.appendChild(mute)
+
+          container.appendChild(row)
+        }
+      }
+
+      const LED_BUTTONS = ['button-vu', 'button-main', 'button-aux-1', 'button-comp', 'button-eq', 'button-verb']
+
+      function buildLeds() {
+        const container = $('leds')
+        container.innerHTML = ''
+        for (const name of LED_BUTTONS) {
+          const btn = document.createElement('button')
+          btn.className = 'led'
+          btn.textContent = name
+          let on = false
+          btn.onclick = () => {
+            on = !on
+            btn.classList.toggle('on', on)
+            // control-surface message built from options + selected bank
+            send(`control:${name}`, on ? 1 : 0, currentBank())
+          }
+          container.appendChild(btn)
+        }
+      }
+
+      // Wrap kmix.send so we can log and surface "no port" gracefully.
+      function send(control, value, bank) {
+        if (!kmix) return
+        const label = Array.isArray(control) ? `[${control.join(',')}]` : control
+        try {
+          kmix.send(control, value, bank)
+          log(`→ send ${label}${value !== undefined && !Array.isArray(control) ? ` = ${value}` : ''}${bank ? ` (bank ${bank})` : ''}`)
+        } catch (err) {
+          log(`✗ send ${label}: ${err.message}`)
+        }
+      }
+
+      // ---- static send controls ------------------------------------------------
+      function wireSendControls() {
+        $('mainFader').oninput = (e) => {
+          $('mainFaderVal').textContent = e.target.value
+          send('main:fader', Number(e.target.value))
+        }
+        $('reverb').oninput = (e) => {
+          $('reverbVal').textContent = e.target.value
+          send('misc:reverb-level', Number(e.target.value))
+        }
+        $('presetSend').onclick = () => send('preset', Number($('preset').value))
+        $('rawSend').onclick = () => {
+          const bytes = $('raw').value.split(',').map((s) => Number(s.trim())).filter((n) => Number.isFinite(n))
+          if (!bytes.length) {
+            log('enter raw bytes, e.g. 176, 1, 127')
+            return
+          }
+          send(bytes)
+        }
+      }
+
+      // ---- KMIX lifecycle ------------------------------------------------------
+      function attachKmix() {
+        // Inbound control events — payload is { control, channel, value, raw }.
+        kmix.on('any', (data) => {
+          log(`← ${data.control || '(unmapped)'}  ch${data.channel} = ${data.value}  [${data.raw.join(', ')}]`)
+        })
+        kmix.on('connected', () => {
+          log('• connected — all K-Mix ports present')
+          renderStatus()
+        })
+        kmix.on('disconnected', () => {
+          log('• disconnected — all K-Mix ports gone')
+          renderStatus()
+        })
+      }
+
+      function buildKmix() {
+        // Pass the same MIDIAccess; rebuild when toggling debug.
+        kmix = new KMIX(access, {}, $('debug').checked ? true : false)
+        attachKmix()
+        renderStatus()
+      }
+
+      $('debug').onchange = () => {
+        if (!access) return
+        buildKmix()
+        log(`— debug ${$('debug').checked ? 'on (see console)' : 'off'}`)
+      }
+
+      $('start').onclick = async () => {
+        try {
+          access = await navigator.requestMIDIAccess()
+          // Watch raw port changes so per-port status stays live even when only
+          // one of the three K-Mix ports comes or goes (KMIX's connected/
+          // disconnected fire only on the all-on / all-off transitions).
+          access.addEventListener('statechange', (e) => {
+            if (e.port?.name?.includes('K-Mix')) {
+              log(`· port ${e.port.state}: ${e.port.name} (${e.port.type})`)
+            }
+            renderStatus()
+          })
+          buildKmix()
+          buildInputChannels()
+          buildLeds()
+          wireSendControls()
+          $('app').hidden = false
+          $('status').textContent = 'ready'
+          if (!kmix.isConnected('control-surface')) {
+            log('⚠ Control Surface not detected — sends will warn until K-Mix is connected')
+          }
+          log('access granted — move a K-Mix control (in a MIDI Bank mode) to see inbound events')
+        } catch (err) {
+          $('status').textContent = 'error'
+          $('status').className = 'warn'
+          log(`ERROR: ${err.message}`)
+        }
+      }
+    </script>
+  </body>
+</html>
