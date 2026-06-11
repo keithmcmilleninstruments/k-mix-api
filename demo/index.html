@@ -82,13 +82,14 @@
           <span class="hint"><code>send('preset', n)</code> — program change</span>
         </div>
 
-        <h2>Control Surface — button LEDs <span class="hint"><code>send('control:&lt;name&gt;', 1|0, bank)</code></span></h2>
+        <h2>Control Surface <span class="hint">— sends use the selected bank · <code>send('control:&lt;name&gt;', v, bank)</code></span></h2>
         <div class="row">
           <span class="name">bank</span>
           <label><input type="radio" name="bank" value="1" checked /> 1</label>
           <label><input type="radio" name="bank" value="2" /> 2</label>
           <label><input type="radio" name="bank" value="3" /> 3</label>
         </div>
+        <div id="rotaries"></div>
         <div class="grid" id="leds"></div>
 
         <h2>Raw bytes <span class="hint"><code>send([status, data1, data2])</code> → Audio Control out</span></h2>
@@ -218,6 +219,36 @@
         }
       }
 
+      function buildRotaries() {
+        const container = $('rotaries')
+        container.innerHTML = ''
+        // K-Mix control surface has 4 rotaries (per-bank), sent as CC.
+        for (let n = 1; n <= 4; n++) {
+          const row = document.createElement('div')
+          row.className = 'row'
+
+          const name = document.createElement('span')
+          name.className = 'name'
+          name.textContent = `rotary ${n}`
+
+          const knob = document.createElement('input')
+          knob.type = 'range'
+          knob.min = '0'
+          knob.max = '127'
+          knob.value = '64'
+          const val = document.createElement('span')
+          val.className = 'val'
+          val.textContent = '64'
+          knob.oninput = () => {
+            val.textContent = knob.value
+            // control-surface CC built from options + selected bank
+            send(`control:rotary-${n}`, Number(knob.value), currentBank())
+          }
+          row.append(name, knob, val)
+          container.appendChild(row)
+        }
+      }
+
       const LED_BUTTONS = ['button-vu', 'button-main', 'button-aux-1', 'button-comp', 'button-eq', 'button-verb']
 
       function buildLeds() {
@@ -314,6 +345,7 @@
           })
           buildKmix()
           buildInputChannels()
+          buildRotaries()
           buildLeds()
           wireSendControls()
           $('app').hidden = false

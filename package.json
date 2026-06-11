@@ -25,6 +25,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "serve": "pnpm run build && pnpm dlx http-server -o /demo/",
     "test": "vitest run",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
