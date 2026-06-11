@@ -1,0 +1,10 @@
+# esbuild (used by tsup/vitest) needs its install script to fetch its binary.
+allowBuilds:
+  esbuild: true
+
+# midi-ports is our own first-party sibling package, so exempt it from the
+# minimumReleaseAge supply-chain gate. Without this, `pnpm install
+# --frozen-lockfile` fails in CI/release whenever a fresh midi-ports version
+# was published more recently than the age cutoff.
+minimumReleaseAgeExclude:
+  - midi-ports
