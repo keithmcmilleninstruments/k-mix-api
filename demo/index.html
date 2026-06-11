@@ -5,112 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>k-mix-api 2.0 demo</title>
     <style>
-      body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem; max-width: 820px; }
-      h1 { font-size: 1.2rem; }
-      h2 { font-size: 1rem; margin: 1.2rem 0 0.4rem; }
-      .sub { color: #666; margin-top: -0.5rem; }
-      .sub b { color: #333; }
-      button { font: inherit; padding: 0.3rem 0.7rem; cursor: pointer; }
-      input[type="text"], input[type="number"] { font: inherit; padding: 0.25rem 0.4rem; }
-      label { margin-right: 0.8rem; }
-      code { background: #eef2f2; padding: 0 3px; border-radius: 3px; }
-      .panel { border: 1px solid #cdd; background: #f6f9f9; border-radius: 8px; padding: 0.4rem 0.9rem 0.9rem; margin: 0.8rem 0; }
-      .panel h2 { margin-top: 0.8rem; }
-      .hint { color: #678; font-size: 12px; }
-      .status { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin: 0.4rem 0; }
-      .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #c33; margin-right: 6px; vertical-align: middle; }
-      .dot.on { background: #2a2; }
-      .row { display: flex; align-items: center; gap: 0.6rem; margin: 0.35rem 0; flex-wrap: wrap; }
-      .row > .name { width: 7rem; color: #445; }
-      .row input[type="range"] { width: 200px; }
-      .row .val { width: 2.4rem; text-align: right; color: #678; font: 12px ui-monospace, monospace; }
-      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.4rem; }
-      .led { border: 1px solid #bcc; border-radius: 6px; background: #eef; padding: 0.4rem; }
-      .led.on { background: #2a2; color: #fff; border-color: #198; }
-      #log { background: #111; color: #0f0; padding: 0.8rem; height: 240px; overflow: auto;
+      :root { color-scheme: dark; }
+      body { font: 14px/1.5 system-ui, sans-serif; margin: 0; padding: 1.5rem 2rem 2rem;
+             background: #1b1b1d; color: #d8d8da; max-width: 1100px; margin: 0 auto; }
+      h1 { font-size: 1.2rem; margin: 0 0 0.2rem; }
+      a { color: #4fc3e8; }
+      .sub { color: #999; margin: 0 0 0.8rem; }
+      .sub b { color: #ccc; }
+      button { font: inherit; padding: 0.3rem 0.7rem; cursor: pointer; background: #303034;
+               color: #e6e6e8; border: 1px solid #444; border-radius: 5px; }
+      button:hover { background: #3a3a40; }
+      label { margin-right: 0.7rem; }
+      code { background: #2a2a2e; padding: 0 4px; border-radius: 3px; color: #b9d6e0; }
+      .hint { color: #888; font-size: 12px; }
+      .bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 1rem; margin: 0.4rem 0; }
+      .panel { border: 1px solid #333; background: #232327; border-radius: 8px; padding: 0.5rem 0.9rem 0.8rem; margin: 0.8rem 0; }
+      .panel h2 { font-size: 0.95rem; margin: 0.4rem 0; color: #cfcfd2; }
+      .status { display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; }
+      .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #b33; margin-right: 6px; vertical-align: middle; }
+      .dot.on { background: #2bbf63; }
+
+      /* The K-Mix SVG is the control surface — ~80% width, centred. */
+      #kmix-svg { width: 80%; max-width: 880px; margin: 1rem auto 0.5rem; display: block; }
+      #kmix-svg svg { width: 100%; height: auto; display: block; border-radius: 10px;
+                      box-shadow: 0 6px 24px rgba(0,0,0,0.45); }
+      /* interactive affordances on SVG controls */
+      #kmix-svg .fader-handle { cursor: ns-resize; }
+      #kmix-svg .rotary-handle { cursor: ew-resize; }
+      #kmix-svg .button { cursor: pointer; }
+      #kmix-svg .fader-handle, #kmix-svg .rotary-handle { touch-action: none; }
+
+      #log { background: #0e0e0e; color: #4be04b; padding: 0.8rem; height: 200px; overflow: auto;
              font: 12px/1.4 ui-monospace, monospace; border-radius: 6px; white-space: pre-wrap; }
-      .warn { color: #a40; }
+      .warn { color: #e08a3a; }
     </style>
   </head>
   <body>
     <h1>k-mix-api 2.0 demo</h1>
     <p class="sub">
-      Full Web MIDI control of the KMI <b>K-Mix</b> — powered by <b>k-mix-api</b>
-      (on <b>midi-ports</b> for topology &amp; hot-plug)
+      Interactive <b>K-Mix</b> control surface — drag faders &amp; rotaries, click buttons.
+      Powered by <b>k-mix-api</b> (on <b>midi-ports</b>). SVG adapted from
+      <a href="https://github.com/keithmcmilleninstruments/k-mix-api-mixer-demo">k-mix-api-mixer-demo</a>.
     </p>
-    <p>
+
+    <div class="bar">
       <button id="start">Request MIDI access</button>
       <span id="status">idle</span>
-      <label style="margin-left: 1rem;"><input type="checkbox" id="debug" /> debug</label>
-    </p>
+      <label><input type="checkbox" id="debug" /> debug</label>
+    </div>
     <p class="hint">
-      No K-Mix attached? The page still loads and shows the API — sends will warn
-      until the Control Surface / Audio Control ports appear. Put K-Mix in a MIDI
-      Bank mode (shift + a numbered transport button) to receive control events.
+      No K-Mix attached? The surface still works — dragging a control sends a MIDI message
+      (it just warns until the ports appear). With K-Mix in a MIDI Bank mode, moving a
+      physical control drives the on-screen one.
     </p>
 
     <div id="app" hidden>
       <div class="panel">
-        <h2>Connection <span class="hint">— <code>kmix.isConnected(port)</code></span></h2>
         <div class="status" id="conn"></div>
-        <p class="hint">Updates live on <code>connected</code>/<code>disconnected</code> events and raw port state changes.</p>
       </div>
 
-      <div class="panel">
-        <h2>Send to K-Mix <span class="hint">— <code>kmix.send(control, value[, bank])</code></span></h2>
-
-        <h2>Audio Control — input channels <span class="hint"><code>send('fader:N', v)</code> · <code>send('mute:N', 0|127)</code></span></h2>
-        <div id="inputs"></div>
-
-        <h2>Audio Control — main &amp; misc</h2>
-        <div class="row">
-          <span class="name">main fader</span>
-          <input type="range" min="0" max="127" value="100" id="mainFader" />
-          <span class="val" id="mainFaderVal">100</span>
-          <span class="hint"><code>send('main:fader', v)</code></span>
-        </div>
-        <div class="row">
-          <span class="name">reverb level</span>
-          <input type="range" min="0" max="127" value="64" id="reverb" />
-          <span class="val" id="reverbVal">64</span>
-          <span class="hint"><code>send('misc:reverb-level', v)</code></span>
-        </div>
-        <div class="row">
-          <span class="name">preset</span>
-          <input type="number" min="0" max="127" value="0" id="preset" style="width: 4rem;" />
-          <button id="presetSend">Recall preset</button>
-          <span class="hint"><code>send('preset', n)</code> — program change</span>
-        </div>
-
-        <h2>Control Surface <span class="hint">— sends use the selected bank · <code>send('control:&lt;name&gt;', v, bank)</code></span></h2>
-        <div class="row">
-          <span class="name">bank</span>
-          <label><input type="radio" name="bank" value="1" checked /> 1</label>
-          <label><input type="radio" name="bank" value="2" /> 2</label>
-          <label><input type="radio" name="bank" value="3" /> 3</label>
-        </div>
-        <div id="rotaries"></div>
-        <div class="grid" id="leds"></div>
-
-        <h2>Raw bytes <span class="hint"><code>send([status, data1, data2])</code> → Audio Control out</span></h2>
-        <div class="row">
-          <input type="text" id="raw" value="176, 1, 127" size="18" />
-          <button id="rawSend">Send raw</button>
-          <span class="hint">e.g. <code>176, 1, 127</code> = CC1 on ch1</span>
-        </div>
+      <div class="bar">
+        <span class="hint">control-surface bank:</span>
+        <label><input type="radio" name="bank" value="1" checked /> 1</label>
+        <label><input type="radio" name="bank" value="2" /> 2</label>
+        <label><input type="radio" name="bank" value="3" /> 3</label>
+        <span style="flex: 1"></span>
+        <span class="hint">help →</span>
+        <button id="help-control">control</button>
+        <button id="help-input">input</button>
+        <button id="help-main">main</button>
+        <button id="help-misc">misc</button>
+        <button id="reset">reset surface</button>
       </div>
 
-      <h2>Inbound events <span class="hint">— <code>kmix.on('any', …)</code></span></h2>
+      <div id="kmix-svg" aria-label="K-Mix control surface"></div>
+
+      <h2 style="font-size:0.95rem; margin:0.6rem 0 0.3rem; color:#cfcfd2;">
+        Inbound events <span class="hint">— <code>kmix.on('any', …)</code></span>
+      </h2>
       <div id="log"></div>
     </div>
 
     <!--
-      k-mix-api's build keeps its one dependency (midi-ports) as a bare ESM
-      import, so the browser needs an import map to resolve it. We point it at
-      the locally-installed copy, which means this demo must be served from the
-      repo root (so /dist and /node_modules are reachable), e.g. `npx
-      http-server` then open /demo/. To run without a local install instead,
-      swap the target for a CDN URL like https://esm.sh/midi-ports@3.
+      k-mix-api keeps its one dependency (midi-ports) as a bare ESM import, so the
+      browser needs an import map to resolve it. We point it at the locally-installed
+      copy, so serve from the repo root (e.g. `pnpm run serve`) and open /demo/.
+      To run without a local install, swap the target for https://esm.sh/midi-ports@3.
     -->
     <script type="importmap">
       {
@@ -121,16 +101,15 @@
     </script>
 
     <script type="module">
-      // k-mix-api is loaded from the local build — run `pnpm run build` (or
-      // `pnpm run dev`) first, then serve from the repo root and open /demo/.
-      // ESM-only, so no bundler is needed.
+      // k-mix-api from the local build — run `pnpm run build` (or `pnpm run serve`)
+      // first, then serve from the repo root and open /demo/. ESM-only, no bundler.
       import KMIX from '../dist/index.js'
 
       const $ = (id) => document.getElementById(id)
+      const convertRange = (v, [a0, a1], [b0, b1]) => ((v - a0) * (b1 - b0)) / (a1 - a0) + b0
+      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
 
-      // Batched, bounded logging. K-Mix can emit control events faster than the
-      // DOM can paint (sweeping a fader), so buffer lines and flush once per
-      // frame, capping the buffer so a backlog can't build up.
+      // Batched, bounded logging — a swept fader can emit faster than the DOM paints.
       const MAX_LOG_LINES = 300
       const logLines = []
       let flushScheduled = false
@@ -143,27 +122,159 @@
       const log = (msg) => {
         logLines.push(`${new Date().toLocaleTimeString()}  ${msg}`)
         if (logLines.length > MAX_LOG_LINES) logLines.splice(0, logLines.length - MAX_LOG_LINES)
-        if (!flushScheduled) {
-          flushScheduled = true
-          requestAnimationFrame(flushLog)
+        if (!flushScheduled) { flushScheduled = true; requestAnimationFrame(flushLog) }
+      }
+
+      let access // raw MIDIAccess
+      let kmix // KMIX instance
+      let svgEl // the injected <svg> element
+      const currentBank = () => Number(document.querySelector('input[name="bank"]:checked')?.value || 1)
+
+      // ---- control-name mapping (SVG ⇄ k-mix-api control names) ----------------
+      // SVG ids/classes use a few names that differ from the 2.0 control names.
+      const svgIdToControl = (id) => (id === 'fader-master' ? 'fader-main' : id) // fader-N / rotary-N pass through
+      function svgClassToControl(cls) {
+        if (cls === 'btn-shift' || cls === 'btn-power') return null // hardware-only, no MIDI
+        if (cls.startsWith('btn-')) return 'button-' + cls.slice(4)
+        if (cls === 'channel-select-master') return 'channel-select-main'
+        if (cls.startsWith('channel-select-')) return cls
+        if (cls.startsWith('diamond-')) return 'transport-' + cls.slice(8)
+        return null
+      }
+      // inbound control name -> the SVG element to drive
+      function controlToTarget(control) {
+        const off = control.endsWith(':off')
+        const base = off ? control.slice(0, -4) : control
+        if (base.startsWith('fader-')) {
+          const id = base === 'fader-main' ? 'fader-master' : base
+          return { kind: 'fader', selector: `#${id} .fader-handle` }
+        }
+        if (base.startsWith('rotary-')) return { kind: 'rotary', selector: `#${base} .rotary-handle` }
+        let cls = null
+        if (base.startsWith('button-')) cls = 'btn-' + base.slice(7)
+        else if (base === 'channel-select-main') cls = 'channel-select-master'
+        else if (base.startsWith('channel-select-')) cls = base
+        else if (base.startsWith('transport-')) cls = 'diamond-' + base.slice(10)
+        return cls ? { kind: 'button', selector: '.' + cls, off } : null
+      }
+
+      // ---- send (wrapped for logging + graceful no-port) -----------------------
+      function send(control, value, bank) {
+        if (!kmix) return
+        try {
+          kmix.send(control, value, bank)
+          log(`→ ${control} = ${value}${bank ? ` (bank ${bank})` : ''}`)
+        } catch (err) {
+          log(`✗ send ${control}: ${err.message}`)
         }
       }
 
-      let access // raw MIDIAccess (kept so we can watch raw statechange)
-      let kmix // KMIX instance
+      // ---- drive SVG controls from values (inbound + reset) --------------------
+      const faderY = (value) => convertRange(clamp(value, 0, 127), [0, 127], [0, -90])
+      const rotaryDeg = (value) => convertRange(clamp(value, 0, 127), [0, 127], [-127, 127])
+      function setFader(selector, value) {
+        const h = svgEl.querySelector(selector)
+        if (!h) return
+        const y = faderY(value)
+        h.setAttribute('data-y', y)
+        h.setAttribute('transform', `translate(0, ${y})`)
+      }
+      function setRotary(selector, value) {
+        const h = svgEl.querySelector(selector)
+        if (!h) return
+        const c = h.previousElementSibling
+        const deg = rotaryDeg(value)
+        h.setAttribute('data-x', deg)
+        h.setAttribute('transform', `rotate(${deg} ${c.cx.animVal.value} ${c.cy.animVal.value})`)
+      }
+      function setButton(selector, on) {
+        svgEl.querySelector(selector)?.classList.toggle('active', on)
+      }
 
-      const PORTS = [
-        ['all', 'All ports'],
-        ['audio-control', 'Audio Control'],
-        ['control-surface', 'Control Surface'],
-        ['expander', 'Expander'],
-      ]
+      // ---- pointer drag (native; no interact.js) -------------------------------
+      const yScale = () => svgEl.getScreenCTM()?.d || 1 // screen px per SVG y-unit
+
+      function wireFader(handle) {
+        const id = handle.closest('[id^="fader-"]')?.id
+        if (!id) return
+        const control = svgIdToControl(id)
+        let dragging = false, startScreenY = 0, startY = 0
+        handle.addEventListener('pointerdown', (e) => {
+          dragging = true
+          startScreenY = e.clientY
+          startY = parseFloat(handle.getAttribute('data-y') || '0')
+          try { handle.setPointerCapture(e.pointerId) } catch {}
+          e.preventDefault()
+        })
+        handle.addEventListener('pointermove', (e) => {
+          if (!dragging) return
+          const y = clamp(startY + (e.clientY - startScreenY) / yScale(), -90, 0)
+          handle.setAttribute('data-y', y)
+          handle.setAttribute('transform', `translate(0, ${y})`)
+          send(`control:${control}`, Math.round(convertRange(y, [0, -90], [0, 127])), currentBank())
+        })
+        const end = (e) => { dragging = false; try { handle.releasePointerCapture(e.pointerId) } catch {} }
+        handle.addEventListener('pointerup', end)
+        handle.addEventListener('pointercancel', end)
+      }
+
+      function wireRotary(handle) {
+        const id = handle.closest('[id^="rotary-"]')?.id
+        if (!id) return
+        const c = handle.previousElementSibling
+        const cx = c.cx.animVal.value, cy = c.cy.animVal.value
+        let dragging = false, startScreenX = 0, startDeg = 0
+        handle.addEventListener('pointerdown', (e) => {
+          dragging = true
+          startScreenX = e.clientX
+          startDeg = parseFloat(handle.getAttribute('data-x') || '0')
+          try { handle.setPointerCapture(e.pointerId) } catch {}
+          e.preventDefault()
+        })
+        handle.addEventListener('pointermove', (e) => {
+          if (!dragging) return
+          const deg = clamp(startDeg + (e.clientX - startScreenX), -127, 127) // px → degrees
+          handle.setAttribute('data-x', deg)
+          handle.setAttribute('transform', `rotate(${deg} ${cx} ${cy})`)
+          send(`control:${id}`, Math.round(convertRange(deg, [-127, 127], [0, 127])), currentBank())
+        })
+        const end = (e) => { dragging = false; try { handle.releasePointerCapture(e.pointerId) } catch {} }
+        handle.addEventListener('pointerup', end)
+        handle.addEventListener('pointercancel', end)
+      }
+
+      function wireButton(group) {
+        const cls = [...group.classList].find((c) => c !== 'button')
+        const control = svgClassToControl(cls)
+        if (!control) return // shift / power: inert
+        group.addEventListener('pointerdown', (e) => {
+          e.preventDefault()
+          const on = !group.classList.contains('active')
+          group.classList.toggle('active', on)
+          send(`control:${control}`, on ? 1 : 0, currentBank())
+        })
+      }
+
+      function wireSurface() {
+        svgEl.querySelectorAll('.fader-handle').forEach(wireFader)
+        svgEl.querySelectorAll('.rotary-handle').forEach(wireRotary)
+        svgEl.querySelectorAll('.button').forEach(wireButton)
+      }
+
+      function resetSurface() {
+        for (let n = 1; n <= 8; n++) setFader(`#fader-${n} .fader-handle`, 0)
+        setFader('#fader-master .fader-handle', 0)
+        for (let n = 1; n <= 4; n++) setRotary(`#rotary-${n} .rotary-handle`, 64)
+        svgEl.querySelectorAll('.button.active').forEach((b) => b.classList.remove('active'))
+        log('— surface reset')
+      }
 
       // ---- connection status ---------------------------------------------------
+      const STATUS = [['all', 'All'], ['audio-control', 'Audio Control'], ['control-surface', 'Control Surface'], ['expander', 'Expander']]
       function renderStatus() {
         const el = $('conn')
         el.innerHTML = ''
-        for (const [key, label] of PORTS) {
+        for (const [key, label] of STATUS) {
           const on = kmix?.isConnected(key) ?? false
           const span = document.createElement('span')
           const dot = document.createElement('span')
@@ -173,187 +284,50 @@
         }
       }
 
-      // ---- send helpers --------------------------------------------------------
-      const currentBank = () =>
-        Number(document.querySelector('input[name="bank"]:checked')?.value || 1)
-
-      function buildInputChannels() {
-        const container = $('inputs')
-        container.innerHTML = ''
-        // 8 input channels: a fader and a mute toggle each.
-        for (let ch = 1; ch <= 8; ch++) {
-          const row = document.createElement('div')
-          row.className = 'row'
-
-          const name = document.createElement('span')
-          name.className = 'name'
-          name.textContent = `channel ${ch}`
-          row.appendChild(name)
-
-          const fader = document.createElement('input')
-          fader.type = 'range'
-          fader.min = '0'
-          fader.max = '127'
-          fader.value = '100'
-          const val = document.createElement('span')
-          val.className = 'val'
-          val.textContent = '100'
-          fader.oninput = () => {
-            val.textContent = fader.value
-            send(`fader:${ch}`, Number(fader.value))
-          }
-          row.append(fader, val)
-
-          const mute = document.createElement('button')
-          let muted = false
-          mute.textContent = 'mute'
-          mute.onclick = () => {
-            muted = !muted
-            mute.style.background = muted ? '#c33' : ''
-            mute.style.color = muted ? '#fff' : ''
-            send(`mute:${ch}`, muted ? 127 : 0)
-          }
-          row.appendChild(mute)
-
-          container.appendChild(row)
-        }
-      }
-
-      function buildRotaries() {
-        const container = $('rotaries')
-        container.innerHTML = ''
-        // K-Mix control surface has 4 rotaries (per-bank), sent as CC.
-        for (let n = 1; n <= 4; n++) {
-          const row = document.createElement('div')
-          row.className = 'row'
-
-          const name = document.createElement('span')
-          name.className = 'name'
-          name.textContent = `rotary ${n}`
-
-          const knob = document.createElement('input')
-          knob.type = 'range'
-          knob.min = '0'
-          knob.max = '127'
-          knob.value = '64'
-          const val = document.createElement('span')
-          val.className = 'val'
-          val.textContent = '64'
-          knob.oninput = () => {
-            val.textContent = knob.value
-            // control-surface CC built from options + selected bank
-            send(`control:rotary-${n}`, Number(knob.value), currentBank())
-          }
-          row.append(name, knob, val)
-          container.appendChild(row)
-        }
-      }
-
-      const LED_BUTTONS = ['button-vu', 'button-main', 'button-aux-1', 'button-comp', 'button-eq', 'button-verb']
-
-      function buildLeds() {
-        const container = $('leds')
-        container.innerHTML = ''
-        for (const name of LED_BUTTONS) {
-          const btn = document.createElement('button')
-          btn.className = 'led'
-          btn.textContent = name
-          let on = false
-          btn.onclick = () => {
-            on = !on
-            btn.classList.toggle('on', on)
-            // control-surface message built from options + selected bank
-            send(`control:${name}`, on ? 1 : 0, currentBank())
-          }
-          container.appendChild(btn)
-        }
-      }
-
-      // Wrap kmix.send so we can log and surface "no port" gracefully.
-      function send(control, value, bank) {
-        if (!kmix) return
-        const label = Array.isArray(control) ? `[${control.join(',')}]` : control
-        try {
-          kmix.send(control, value, bank)
-          log(`→ send ${label}${value !== undefined && !Array.isArray(control) ? ` = ${value}` : ''}${bank ? ` (bank ${bank})` : ''}`)
-        } catch (err) {
-          log(`✗ send ${label}: ${err.message}`)
-        }
-      }
-
-      // ---- static send controls ------------------------------------------------
-      function wireSendControls() {
-        $('mainFader').oninput = (e) => {
-          $('mainFaderVal').textContent = e.target.value
-          send('main:fader', Number(e.target.value))
-        }
-        $('reverb').oninput = (e) => {
-          $('reverbVal').textContent = e.target.value
-          send('misc:reverb-level', Number(e.target.value))
-        }
-        $('presetSend').onclick = () => send('preset', Number($('preset').value))
-        $('rawSend').onclick = () => {
-          const bytes = $('raw').value.split(',').map((s) => Number(s.trim())).filter((n) => Number.isFinite(n))
-          if (!bytes.length) {
-            log('enter raw bytes, e.g. 176, 1, 127')
-            return
-          }
-          send(bytes)
-        }
-      }
-
       // ---- KMIX lifecycle ------------------------------------------------------
       function attachKmix() {
-        // Inbound control events — payload is { control, channel, value, raw }.
         kmix.on('any', (data) => {
           log(`← ${data.control || '(unmapped)'}  ch${data.channel} = ${data.value}  [${data.raw.join(', ')}]`)
+          const t = controlToTarget(data.control || '')
+          if (!t) return
+          if (t.kind === 'fader') setFader(t.selector, data.value)
+          else if (t.kind === 'rotary') setRotary(t.selector, data.value)
+          else if (t.kind === 'button') setButton(t.selector, !t.off)
         })
-        kmix.on('connected', () => {
-          log('• connected — all K-Mix ports present')
-          renderStatus()
-        })
-        kmix.on('disconnected', () => {
-          log('• disconnected — all K-Mix ports gone')
-          renderStatus()
-        })
+        kmix.on('connected', () => { log('• connected — all K-Mix ports present'); renderStatus() })
+        kmix.on('disconnected', () => { log('• disconnected — all K-Mix ports gone'); renderStatus() })
       }
-
       function buildKmix() {
-        // Pass the same MIDIAccess; rebuild when toggling debug.
         kmix = new KMIX(access, {}, $('debug').checked ? true : false)
         attachKmix()
         renderStatus()
       }
 
-      $('debug').onchange = () => {
-        if (!access) return
-        buildKmix()
-        log(`— debug ${$('debug').checked ? 'on (see console)' : 'off'}`)
-      }
+      $('debug').onchange = () => { if (access) { buildKmix(); log(`— debug ${$('debug').checked ? 'on (see console)' : 'off'}`) } }
+      $('help-control').onclick = () => kmix?.help('control')
+      $('help-input').onclick = () => kmix?.help('input')
+      $('help-main').onclick = () => kmix?.help('main')
+      $('help-misc').onclick = () => kmix?.help('misc')
+      $('reset').onclick = () => kmix && resetSurface()
 
       $('start').onclick = async () => {
         try {
+          // load the SVG surface
+          const svgText = await (await fetch('./kmix.svg')).text()
+          $('kmix-svg').innerHTML = svgText
+          svgEl = $('kmix-svg').querySelector('svg')
+
           access = await navigator.requestMIDIAccess()
-          // Watch raw port changes so per-port status stays live even when only
-          // one of the three K-Mix ports comes or goes (KMIX's connected/
-          // disconnected fire only on the all-on / all-off transitions).
           access.addEventListener('statechange', (e) => {
-            if (e.port?.name?.includes('K-Mix')) {
-              log(`· port ${e.port.state}: ${e.port.name} (${e.port.type})`)
-            }
+            if (e.port?.name?.includes('K-Mix')) log(`· port ${e.port.state}: ${e.port.name} (${e.port.type})`)
             renderStatus()
           })
           buildKmix()
-          buildInputChannels()
-          buildRotaries()
-          buildLeds()
-          wireSendControls()
+          wireSurface()
           $('app').hidden = false
           $('status').textContent = 'ready'
-          if (!kmix.isConnected('control-surface')) {
-            log('⚠ Control Surface not detected — sends will warn until K-Mix is connected')
-          }
-          log('access granted — move a K-Mix control (in a MIDI Bank mode) to see inbound events')
+          if (!kmix.isConnected('control-surface')) log('⚠ Control Surface not detected — sends will warn until K-Mix is connected')
+          log('access granted — drag a control, or move K-Mix (in a MIDI Bank mode) to drive the surface')
         } catch (err) {
           $('status').textContent = 'error'
           $('status').className = 'warn'
